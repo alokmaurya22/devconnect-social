@@ -198,7 +198,7 @@ const PostCard = ({ post }) => {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={handleLikeClick}
-                        className={`flex items-center gap-1 transition duration-200 ${liked ? "text-red-500" : "text-gray-500 hover:text-red-500"
+                        className={`flex items-center gap-1 transition duration-200 ${liked ? "text-red-500" : " hover:text-red-500"
                             }`}
                     >
                         <FaHeart className="text-base" />
