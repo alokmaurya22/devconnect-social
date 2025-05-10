@@ -7,7 +7,7 @@ export const TabButton = ({ label, value, activeTab, setActiveTab }) => (
         className={`w-1/2 py-2 font-semibold text-center border-b-2 transition 
         ${activeTab === value
                 ? "border-brand-orange text-brand-orange"
-                : "border-transparent text-gray-500 dark:text-gray-400"
+                : "border-transparent text-gray-500 dark:text-gray-400 "
             }`}
     >
         {label}
