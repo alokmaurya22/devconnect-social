@@ -12,7 +12,6 @@ const Chats = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [messageInput, setMessageInput] = useState("");
-
     const filteredUsers = dummyUsers.filter((user) =>
         user.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
