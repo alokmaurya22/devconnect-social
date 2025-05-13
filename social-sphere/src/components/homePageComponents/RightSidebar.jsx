@@ -5,7 +5,7 @@ const RightSidebar = () => {
         <aside className="hidden lg:block w-1/5 pl-4 space-y-6 pt-5 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-700">
             <input
                 type="text"
-                placeholder="Search DevConnect "
+                placeholder="Search DevConnect"
                 className="w-full px-4 py-2 rounded-full bg-light-card dark:bg-dark-card border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-orange"
             />
 
