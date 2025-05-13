@@ -20,7 +20,7 @@ const PostCard = ({ post }) => {
         saved: post.saved || false,
     });
     const [actionCounts, setActionCounts] = useState({
-        likes: 0,
+        likes: 1,
         comments: 0,
         shares: 0,
         saves: 0,
@@ -78,6 +78,8 @@ const PostCard = ({ post }) => {
         switch (actionName) {
             case "Like":
                 const liked = await toggleLike(post.id, currentUserId);
+                console.log("liked", liked);
+
                 setActionStatus((prev) => ({
                     ...prev,
                     liked, // 👈 Ye turant local state update karega
@@ -137,6 +139,9 @@ const PostCard = ({ post }) => {
     const postTime = post.createdAt?.toDate
         ? timeAgo(post.createdAt.toDate())
         : "Just now";
+
+    console.log("actionCounts: ", actionCounts);
+
 
     return (
         <div className="bg-white dark:bg-dark-card rounded-lg shadow p-4 mb-6">
@@ -203,7 +208,8 @@ const PostCard = ({ post }) => {
                     >
                         <FaHeart className="text-base" />
                         <span>Like</span>
-                        <span>({actionCounts.likes})</span>
+
+                        <span>{/*actionCounts.saves*/}</span>
                     </button>
 
 
@@ -215,7 +221,6 @@ const PostCard = ({ post }) => {
                     >
                         <FaRegComment className="text-base" />
                         <span>Comment</span>
-                        <span>({actionCounts.comments})</span>
                     </button>
 
                     <button
@@ -224,7 +229,6 @@ const PostCard = ({ post }) => {
                     >
                         <FaShare className="text-base" />
                         <span>Share</span>
-                        <span>({actionCounts.shares})</span>
                     </button>
                 </div>
 
@@ -234,7 +238,6 @@ const PostCard = ({ post }) => {
                 >
                     <FaBookmark className="text-base" />
                     <span>Save</span>
-                    <span>({actionCounts.saves})</span>
                 </button>
             </div>
 

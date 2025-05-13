@@ -60,7 +60,7 @@ const LeftSidebar = ({ onPostClick }) => {
             </button>
 
             {/* 🔧 Dummy Post Upload Button */}
-            {<UploadDummyPosts />}
+            {/*<UploadDummyPosts />*/}
 
 
         </aside>
