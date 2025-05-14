@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Smooth transition */
+html {
+  scroll-behavior: smooth;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 115, 0, 0.5);
+  /* orange-ish for dark mode */
+  border-radius: 10px;
+  border: 2px solid transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  /* light for dark bg */
+}
