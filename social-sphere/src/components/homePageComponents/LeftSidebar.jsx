@@ -51,7 +51,7 @@ const LeftSidebar = ({ onPostClick }) => {
                 <SidebarItem icon={<FaEllipsisH />} label="More" />
             </Link>
             */}
-            {/* ✅ POST BUTTON - triggers modal instead of page change */}
+            {/* POST BUTTON - triggers modal instead of page change */}
             <button
                 onClick={handlePostClick}
                 className="mt-4 bg-brand-orange text-white px-10 py-2 w-max rounded-full font-medium hover:bg-brand-orange-hover transition"
