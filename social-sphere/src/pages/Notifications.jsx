@@ -15,7 +15,6 @@ const UnderDevelopment = () => {
                     alt="Under Construction"
                     className="w-32 mx-auto mb-6 opacity-90 dark:invert"
                 />
-
                 <Link to="/home">
                     <button className="w-full bg-brand-orange text-white font-semibold py-2.5 rounded-lg hover:bg-brand-orange-hover transition text-sm">
                         Go to Home

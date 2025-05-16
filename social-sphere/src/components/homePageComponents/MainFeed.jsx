@@ -26,10 +26,8 @@ const MainFeed = () => {
                     <TabButton label="Following" value="following" activeTab={activeTab} setActiveTab={handleTabChange} />
                 </div>
             </div>
-
             {/* Feed content */}
             <Feed activeTab={activeTab} />
-
             {/* Extra spacing so last post is not hidden behind the fixed footer */}
             <div className="h-20"></div>
         </main>

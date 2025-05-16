@@ -22,7 +22,6 @@ export const uploadPost = async ({ title, content, tag, file, viewtype }) => {
         mediaURL = await getDownloadURL(fileRef);
         mediaType = file.type.startsWith("image") ? "image" : "video";
     }
-
     const postData = {
         postUserId,
         title,

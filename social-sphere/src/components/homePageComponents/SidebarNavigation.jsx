@@ -19,7 +19,6 @@ const navItems = [
     { path: "/bookmarks", label: "Bookmarks", icon: <FaBookmark /> },
     { path: "/profile", label: "Profile", icon: <FaUser /> },
 ];
-
 const SidebarNavigation = ({ onClick, itemClass = "", wrapperClass = "" }) => {
     return (
         <div className={wrapperClass}>

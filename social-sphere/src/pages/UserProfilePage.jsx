@@ -34,7 +34,6 @@ const UserProfilePage = () => {
             setIsFollowing(result);
         }
     };
-
     useEffect(() => {
         fetchUserData();
         updateFollowStatus();

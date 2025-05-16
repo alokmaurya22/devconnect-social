@@ -15,5 +15,4 @@ const GuestTimerDisplay = () => {
         </div>
     );
 };
-
 export default GuestTimerDisplay;

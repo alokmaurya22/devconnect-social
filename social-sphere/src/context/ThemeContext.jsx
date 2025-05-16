@@ -13,7 +13,6 @@ export const ThemeProvider = ({ children }) => {
         const savedTheme = localStorage.getItem("devconnect-theme");
         return savedTheme ? savedTheme : "light";
     });
-
     // Update <html> class for Tailwind to react
     useEffect(() => {
         const root = window.document.documentElement;

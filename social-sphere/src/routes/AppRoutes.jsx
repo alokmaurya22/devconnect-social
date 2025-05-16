@@ -12,7 +12,6 @@ import Explore from "../pages/Explore";
 import Notifications from "../pages/Notifications";
 import Bookmarks from "../pages/Bookmarks";
 import RightSidebar from "../components/homePageComponents/RightSidebar";
-
 const AppRoutes = () => {
     const allowedRoutes = ["/login", "/signup", "/"]; // 👈 guest can access
 

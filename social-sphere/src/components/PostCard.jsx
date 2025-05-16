@@ -186,7 +186,6 @@ const PostCard = ({ post }) => {
             {/* Content */}
             <p className="text-sm sm:text-base mb-2 ml-2">{post.content}</p>
 
-
             {/* Media */}
             {post.mediaURL && (
                 <div className="w-full aspect-video overflow-hidden rounded-lg mt-2">
@@ -217,7 +216,7 @@ const PostCard = ({ post }) => {
 
 
                     <button
-                        onClick={() => handleAction("Comment")}
+                        onClick={() => handleAction("Comment1")}
                         className="flex items-center gap-1 hover:text-blue-500 transition"
                     >
                         <FaRegComment className="text-base" />

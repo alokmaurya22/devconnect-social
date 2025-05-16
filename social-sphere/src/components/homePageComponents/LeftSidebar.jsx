@@ -25,7 +25,6 @@ const LeftSidebar = ({ onPostClick }) => {
             onPostClick();
         }
     };
-
     return (
         <aside className="hidden md:flex flex-col w-1/5 space-y-6 pr-4 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-700 pt-12">
             {/* Sidebar Nav Links */}

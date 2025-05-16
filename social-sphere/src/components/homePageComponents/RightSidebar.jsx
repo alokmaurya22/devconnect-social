@@ -14,16 +14,15 @@ const RightSidebar = () => {
 
                 <div className="bg-white dark:bg-dark-card rounded-lg shadow p-4">
                     <h3 className="font-bold text-lg mb-3">What’s happening</h3>
-                    <TrendingItem tag="#100DaysOfCode" />
+                    <TrendingItem tag="#100DaysChallenge" />
                     <TrendingItem tag="#ReactJS" />
-                    <TrendingItem tag="#OpenSource" />
+                    <TrendingItem tag="#India" />
                 </div>
-
                 <div className="bg-white dark:bg-dark-card rounded-lg shadow p-4">
                     <h3 className="font-bold text-lg mb-3">Who to follow</h3>
-                    <FollowSuggestion name="Ananya Sharma" />
-                    <FollowSuggestion name="Rohan Codes" />
-                    <FollowSuggestion name="Priya Dev" />
+                    <FollowSuggestion name="Anuj Gupta" />
+                    <FollowSuggestion name="Alok Maurya" />
+                    <FollowSuggestion name="Naveen Tiwari" />
                 </div>
             </aside>
 

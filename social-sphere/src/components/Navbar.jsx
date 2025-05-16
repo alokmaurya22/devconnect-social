@@ -12,7 +12,6 @@ import logo from "../assets/logo_new.png";
 import SidebarNavigation from "./homePageComponents/SidebarNavigation";
 import UploadDummyPosts from "./UploadDummyPosts";
 import { FaSignOutAlt, FaFire, FaUserPlus, FaUserLock, FaHome } from "react-icons/fa";
-
 const Navbar = () => {
     const { theme, toggleTheme } = useTheme();
     const { isAuthenticated, setIsAuthenticated } = useGuestTimer();

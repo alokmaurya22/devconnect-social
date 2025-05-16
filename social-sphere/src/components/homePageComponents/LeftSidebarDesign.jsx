@@ -50,5 +50,4 @@ const LeftSidebarDesign = ({ onPostClick }) => {
         </>
     );
 };
-
 export default LeftSidebarDesign;

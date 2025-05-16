@@ -29,7 +29,7 @@ const Feed = ({ activeTab }) => {
         },
         {
             id: 4,
-            username: "alok_dev",
+            username: "alok_devloper",
             time: "2h ago",
             content: "Learning React with Tailwind CSS is super fun! 🚀 #DevConnect",
             image: "",

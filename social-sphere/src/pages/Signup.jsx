@@ -122,7 +122,6 @@ const SignUp = () => {
                         Sign Up
                     </button>
                 </form>
-
                 {/* Login Redirect */}
                 <p className="text-sm mt-4 text-center">
                     Already have an account?{" "}

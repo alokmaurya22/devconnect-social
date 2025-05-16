@@ -12,7 +12,6 @@ const ProfilePage = () => {
                     </p>
                 </div>
 
-
                 <div className="bg-white dark:bg-dark-card rounded-xl shadow-xl p-6 md:p-8 flex flex-col md:flex-row gap-10">
                     {/* DP Section */}
                     <div className="flex flex-col items-center justify-center w-full md:w-1/3">

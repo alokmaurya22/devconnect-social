@@ -117,5 +117,4 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
         document.getElementById("modal-root")
     );
 };
-
 export default LoginModal;

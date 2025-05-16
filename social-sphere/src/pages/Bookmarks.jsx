@@ -25,5 +25,4 @@ const UnderDevelopment = () => {
         </div>
     );
 };
-
 export default UnderDevelopment;

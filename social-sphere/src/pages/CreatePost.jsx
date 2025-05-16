@@ -60,7 +60,6 @@ const CreatePost = () => {
                 <h2 className="text-3xl font-bold text-brand-orange mb-6 text-center">
                     Create a New Post
                 </h2>
-
                 <form onSubmit={handleSubmit} className="space-y-5">
                     {/* Title */}
                     <div>

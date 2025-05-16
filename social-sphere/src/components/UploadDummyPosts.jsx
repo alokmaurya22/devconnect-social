@@ -53,7 +53,6 @@ const UploadDummyPosts = () => {
             const userSno = `${Math.floor(1 + Math.random() * 100)}`;
             const postId = `${userId}_${Date.now()}_${i}`;
             const viewType = viewTypes[i % viewTypes.length];
-
             const includeImage = i % 5 !== 0; // every 5th post has no image
             const mediaURL = includeImage ? imageUrls[i % imageUrls.length] : "";
             const mediaType = includeImage ? "image" : "";

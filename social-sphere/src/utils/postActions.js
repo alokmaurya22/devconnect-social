@@ -97,7 +97,6 @@ export const checkPostActionStatus = async (postId, userId) => {
     const likeRef = doc(db, "posts", postId, "likes", userId);
     const shareRef = doc(db, "posts", postId, "shares", userId);
     const userRef = doc(db, "users", userId);
-
     const [likeSnap, shareSnap, userSnap] = await Promise.all([
         getDoc(likeRef),
         getDoc(shareRef),

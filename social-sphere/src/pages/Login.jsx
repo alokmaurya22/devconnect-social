@@ -15,7 +15,6 @@ const Login = () => {
     useEffect(() => {
         setShowTimer(false);
     }, [setShowTimer]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -73,7 +72,7 @@ const Login = () => {
                     <div className="flex items-center justify-center">
                         <button
                             type="button"
-                            className="flex items-center gap-3 px-5 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-light-card dark:bg-[#0c0c0c] hover:border-brand-orange hover:bg-white dark:hover:bg-[#1a1a1a] transition w-full justify-center"
+                            className="flex items-center gap-3 px-5 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-light-card dark:bg-[#0c0c0c] hover:border-brand-orange hover:bg-white dark:hover:bg-[#1a1a1a] transition w-full justify-center "
                         >
                             <FcGoogle className="text-xl" />
                             <span className="text-sm font-medium text-black dark:text-white">

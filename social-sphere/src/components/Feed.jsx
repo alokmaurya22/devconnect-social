@@ -173,7 +173,6 @@ const Feed = ({ activeTab }) => {
                     )
                 )
             )}
-
             {/* Loader jab data load ho raha ho */}
             {isLoading && <Loader />}
 

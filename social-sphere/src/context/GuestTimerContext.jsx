@@ -45,7 +45,7 @@ export const GuestTimerProvider = ({ children }) => {
         return () => clearInterval(timer);
     }, [timerActive]);
 
-    // ✅ Called on login form submit
+    //  Called on login form submit
     const handleLoginSuccess = () => {
         setIsAuthenticated(true);
         setShowTimer(false);

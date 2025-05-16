@@ -119,7 +119,6 @@ export const logoutUser = async (navigate, setIsAuthenticated, setShowTimer) => 
         setIsAuthenticated(false);
         setShowTimer(true);
         navigate("/");
-
         //console.log("🚪 Successfully logged out!!!!!!!");
     } catch (error) {
         console.error("Logout Error:", error.message);

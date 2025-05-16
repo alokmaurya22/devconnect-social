@@ -6,7 +6,6 @@ const ProtectedRoute = ({ element, allowedRoutes = [] }) => {
     const { isAuthenticated, openLoginModal } = useGuestTimer();
     const location = useLocation();
     const currentPath = location.pathname;
-
     const [showElement, setShowElement] = useState(false);
 
     useEffect(() => {

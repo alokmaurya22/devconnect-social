@@ -13,7 +13,6 @@ export const TabButton = ({ label, value, activeTab, setActiveTab }) => (
         {label}
     </button>
 );
-
 // Sidebar Item
 export const SidebarItem = ({ icon, label }) => (
     <button className="flex items-center space-x-4 text-lg hover:text-brand-orange transition">

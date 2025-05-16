@@ -9,7 +9,6 @@ const UnderDevelopment = () => {
                 <p className="text-sm text-gray-700 dark:text-gray-300 mb-6">
                     This page is currently under construction. We’re working hard to bring it to life!
                 </p>
-
                 <img
                     src="https://cdn-icons-png.flaticon.com/512/2784/2784461.png"
                     alt="Under Construction"

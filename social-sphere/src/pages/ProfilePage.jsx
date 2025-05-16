@@ -267,7 +267,6 @@ const ProfilePage = () => {
                             <p className="mt-2 text-sm text-gray-400 text-center italic">
                                 “A profile picture speaks before you do.”
                             </p>
-
                             <div className="mt-4 flex gap-6 text-sm text-gray-600 dark:text-gray-300 font-medium justify-center">
                                 <div className="text-center">
                                     <span className="block text-lg font-bold">{userFollowers}</span>
