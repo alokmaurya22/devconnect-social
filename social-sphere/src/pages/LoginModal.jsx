@@ -104,11 +104,12 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
                     {/* Sign up redirect */}
                     <p className="text-sm mt-5 text-center text-black dark:text-white">
                         Don&apos;t have an account?{" "}
-                        <Link to="/signup">
-                            <span className="text-brand-orange hover:underline cursor-pointer">
-                                Sign Up
-                            </span>
-                        </Link>
+                        <span
+                            className="text-brand-orange hover:underline cursor-pointer"
+                            onClick={() => (window.location.href = "/signup")}
+                        >
+                            Sign Up
+                        </span>
                     </p>
                 </div>
             </div>

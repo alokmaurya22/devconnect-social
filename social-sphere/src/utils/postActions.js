@@ -86,6 +86,14 @@ export const fetchComments = async (postId, lastCommentDoc = null) => {
 
 // Check if user liked/saved/shared
 export const checkPostActionStatus = async (postId, userId) => {
+    if (!postId || !userId) {
+        //console.warn("Invalid postId or userId passed to checkPostActionStatus");
+        return {
+            liked: false,
+            shared: false,
+            saved: false
+        };
+    }
     const likeRef = doc(db, "posts", postId, "likes", userId);
     const shareRef = doc(db, "posts", postId, "shares", userId);
     const userRef = doc(db, "users", userId);
@@ -108,7 +116,7 @@ export const checkPostActionStatus = async (postId, userId) => {
 // Get action count
 export const getActionCount = async (postId, actionType) => {
     if (!postId || !actionType) {
-        console.warn("Invalid postId or actionType passed to getActionCount");
+        //console.warn("Invalid postId or actionType passed to getActionCount");
         return 0;
     }
 

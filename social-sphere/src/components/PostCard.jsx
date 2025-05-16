@@ -78,7 +78,7 @@ const PostCard = ({ post }) => {
         switch (actionName) {
             case "Like":
                 const liked = await toggleLike(post.id, currentUserId);
-                console.log("liked", liked);
+                //console.log("liked", liked);
 
                 setActionStatus((prev) => ({
                     ...prev,
@@ -140,13 +140,13 @@ const PostCard = ({ post }) => {
         ? timeAgo(post.createdAt.toDate())
         : "Just now";
 
-    console.log("actionCounts: ", actionCounts);
+    //console.log("actionCounts: ", actionCounts);
 
 
     return (
-        <div className="bg-white dark:bg-dark-card rounded-lg shadow p-4 mb-6">
+        <div className="bg-white dark:bg-dark-card rounded-lg shadow p-4">
             {/* Top: User Info */}
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                     {post.profileDP ? (
                         <img
@@ -177,14 +177,15 @@ const PostCard = ({ post }) => {
 
             {/* Title */}
             {post.title && (
-                <h2 className="text-pretty font-semibold text-gray-800 dark:text-white inline-block relative mb-1">
+                <h2 className="text-pretty font-semibold text-gray-900 dark:text-white inline-block relative mb-1 ml-2">
                     {post.title}
                     <span className="block h-[2px] w-full bg-brand-orange absolute bottom-0 left-0"></span>
                 </h2>
             )}
 
             {/* Content */}
-            <p className="text-base mb-2">{post.content}</p>
+            <p className="text-sm sm:text-base mb-2 ml-2">{post.content}</p>
+
 
             {/* Media */}
             {post.mediaURL && (
@@ -199,7 +200,7 @@ const PostCard = ({ post }) => {
             )}
 
             {/* Action Buttons */}
-            <div className="flex justify-between mt-4 text-sm text-gray-600 dark:text-gray-300">
+            <div className="flex justify-between mt-4 text-sm text-gray-600 dark:text-gray-300 px-2">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={handleLikeClick}

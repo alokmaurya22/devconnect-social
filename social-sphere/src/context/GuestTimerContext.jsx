@@ -7,7 +7,7 @@ const GuestTimerContext = createContext();
 export const GuestTimerProvider = ({ children }) => {
     const location = useLocation();
 
-    const guestTimerDuration = 100; // ⏱️ Customize timer duration
+    const guestTimerDuration = 300; // ⏱️ Customize timer duration
     const [secondsLeft, setSecondsLeft] = useState(guestTimerDuration);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [showTimer, setShowTimer] = useState(true);

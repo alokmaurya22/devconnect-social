@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import RightSidebar from "../components/homePageComponents/RightSidebar";
-import LeftSidebar from "../components/homePageComponents/LeftSidebar";
+import LeftSidebarDesign from "../components/homePageComponents/LeftSidebarDesign";
 import MainFeed from "../components/homePageComponents/MainFeed";
 import CreatePostModel from "./CreatePostModel";
 import { useGuestTimer } from "../context/GuestTimerContext";
@@ -10,25 +10,27 @@ const Home = () => {
     const { setShowTimer, isAuthenticated } = useGuestTimer();
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            setShowTimer(true);
-        } else {
-            setShowTimer(false);
-        }
+        setShowTimer(!isAuthenticated);
     }, [isAuthenticated]);
 
     return (
         <>
+            {/* Modal Overlay */}
             {showModal && (
                 <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-all duration-300"></div>
             )}
 
-            <div className="pt-16 px-4 md:px-8 flex gap-4">
-                <LeftSidebar onPostClick={() => setShowModal(true)} />
+            {/*  Mobile View (MainFeed only) */}
+            <div className="block md:hidden pt-14 ">
+                <MainFeed onPostClick={() => setShowModal(true)} />
+            </div>
+
+            {/*  Desktop View (3-column layout) */}
+            <div className="hidden md:flex pt-16 px-8 gap-4 w-full">
+                <LeftSidebarDesign onPostClick={() => setShowModal(true)} />
                 <MainFeed onPostClick={() => setShowModal(true)} />
                 <RightSidebar onPostClick={() => setShowModal(true)} />
             </div>
-
             {showModal && <CreatePostModel onClose={() => setShowModal(false)} />}
         </>
     );

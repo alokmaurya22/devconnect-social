@@ -11,7 +11,7 @@ const generateUsername = (fullName) => {
     return `${trimmedName}${timestamp}`;
 };
 
-// ✅ Get next user serial number (userSno)
+//  Get next user serial number (userSno)
 const getNextUserSno = async () => {
     const counterRef = doc(db, "counters", "users");
     const counterSnap = await getDoc(counterRef);
@@ -26,7 +26,7 @@ const getNextUserSno = async () => {
     }
 };
 
-// ✅ Signup Function
+//  Signup Function
 export const signUpUser = async ({ fullName, email, password }, onSuccess, onError) => {
     try {
         // Step 1: Create user with email and password using Firebase Authentication
@@ -62,11 +62,11 @@ export const signUpUser = async ({ fullName, email, password }, onSuccess, onErr
         // Step 5: Store user ID in sessionStorage
         sessionStorage.setItem("userID", uid);
 
-        console.log("✅ Signup Successful!");
-        console.log("UserID:", uid);
-        console.log("UserID from sessionStorage:", sessionStorage.getItem("userID"));
-        console.log("Username:", username);
-        console.log("Full Name:", fullName);
+        //console.log(" Signup Successful!");
+        //console.log("UserID:", uid);
+        //console.log("UserID from sessionStorage:", sessionStorage.getItem("userID"));
+        //console.log("Username:", username);
+        //console.log("Full Name:", fullName);
 
         // Trigger success callback
         if (onSuccess) onSuccess();
@@ -77,7 +77,7 @@ export const signUpUser = async ({ fullName, email, password }, onSuccess, onErr
     }
 };
 
-// ✅ Login Function
+//  Login Function
 export const loginUser = async ({ email, password }, onSuccess, onError) => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -90,13 +90,13 @@ export const loginUser = async ({ email, password }, onSuccess, onError) => {
         const userData = userDoc.data();
         const userSno = userData.userSno;
 
-        // ✅ Store in sessionStorage
+        //  Store in sessionStorage
         sessionStorage.setItem("userID", uid);
         sessionStorage.setItem("userSno", userSno);
 
-        console.log("✅ Login Successful!");
-        console.log("UserID:", uid);
-        console.log("User Serial No:", userSno);
+        //console.log(" Login Successful!");
+        //console.log("UserID:", uid);
+        //console.log("User Serial No:", userSno);
 
         if (onSuccess) onSuccess();
     } catch (error) {
@@ -105,7 +105,7 @@ export const loginUser = async ({ email, password }, onSuccess, onError) => {
     }
 };
 
-// ✅ Logout Function
+//  Logout Function
 export const logoutUser = async (navigate, setIsAuthenticated, setShowTimer) => {
     try {
         // Step 1: Firebase se logout
@@ -120,7 +120,7 @@ export const logoutUser = async (navigate, setIsAuthenticated, setShowTimer) => 
         setShowTimer(true);
         navigate("/");
 
-        console.log("🚪 Successfully logged out!!!!!!!");
+        //console.log("🚪 Successfully logged out!!!!!!!");
     } catch (error) {
         console.error("Logout Error:", error.message);
     }

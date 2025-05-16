@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { doc, getDoc, updateDoc, query, where, getDocs, collection, } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../configuration/firebaseConfig";
@@ -24,9 +24,6 @@ const ProfilePage = () => {
     const [usernameStatus, setUsernameStatus] = useState("");
     const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
 
-    // ref for debounce timer
-    const debounceTimerRef = useRef(null);
-
     // fetch user data
     useEffect(() => {
         const fetchUserData = async () => {
@@ -42,7 +39,7 @@ const ProfilePage = () => {
                 setFormData((prev) => ({ ...prev, ...userData }));
                 if (userData.dp) setImage(userData.dp);
             } else {
-                console.log("No such user!");
+                //console.log("No such user!");
             }
         };
 
@@ -53,7 +50,7 @@ const ProfilePage = () => {
     useEffect(() => {
         const fetchPosts = async () => {
             const uid = sessionStorage.getItem("userID");
-            console.log("User ID:", uid);
+            //console.log("User ID:", uid);
             if (!uid) return;
 
             const q = query(
@@ -67,7 +64,7 @@ const ProfilePage = () => {
                 ...doc.data()
             }));
 
-            console.log("Fetched Posts by User:", postsArray);
+            //console.log("Fetched Posts by User:", postsArray);
             setPosts(postsArray);
         };
 
@@ -75,28 +72,9 @@ const ProfilePage = () => {
     }, []);
 
     //setup for important data
-    //console.log("Current UserData:", currentUserData);
     const currentUsername = currentUserData.username;
     const userFollowers = currentUserData?.followers?.length || 0;
     const userFollowings = currentUserData?.followings?.length || 0;
-
-
-
-    // input change
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-
-        if (name === "username") {
-            debounceUsernameCheck(
-                value,
-                setUsernameStatus,
-                setIsUsernameAvailable,
-                handleSubmitButtonState,
-                currentUsername
-            );
-        }
-    };
 
     // image change
     const handleImageChange = async (e) => {
@@ -109,15 +87,67 @@ const ProfilePage = () => {
                 setImageFile(compressedFile); // for upload
                 setImage(compressedImageURL); // for preview
             } catch (error) {
-                console.error('Image compression error:', error);
+                //console.error('Image compression error:', error);
             }
         }
     };
 
 
+    // check username Availability
+    const checkUsernameAvailability = async (
+        username,
+        setUsernameStatus,
+        setIsUsernameAvailable,
+        currentUsername
+    ) => {
+        //console.log(username, " and ", currentUsername);
+        if (!username) {
+            setUsernameStatus("Enter valid Username !");
+            setIsUsernameAvailable(null);
+            return false;
+        }
+        if (username.includes("@" || " ")) {
+            setUsernameStatus("Username can't contain @");
+            setIsUsernameAvailable(null);
+            return false;
+        }
+        if (username === currentUsername) {
+            setIsUsernameAvailable(true);
+            return true;
+        }
+        try {
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("username", "==", username));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                setIsUsernameAvailable(true);
+                return true;
+            } else {
+                setUsernameStatus("Username already taken!");
+                setIsUsernameAvailable(false);
+                return false;
+            }
+        } catch (err) {
+            //console.error("Error checking username:", err);
+            setUsernameStatus("Something went wrong!");
+            return false;
+        }
+    };
+
+
+
     // submit profile form
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const username = formData.username.toLowerCase();
+        const isAvailable = await checkUsernameAvailability(
+            username,
+            setUsernameStatus,
+            setIsUsernameAvailable,
+            currentUsername
+        );
+        if (!isAvailable) return;
         setIsLoading(true); // Loader start
         try {
             const uid = sessionStorage.getItem("userID");
@@ -134,87 +164,38 @@ const ProfilePage = () => {
 
             await updateDoc(userRef, {
                 ...formData,
+                username: username.trim().toLowerCase(),
                 dp: dpURL,
             });
 
             alert("Profile updated successfully!");
         } catch (err) {
-            console.error("Update error:", err);
+            //console.error("Update error:", err);
             alert("Error updating profile. Try again.");
         } finally {
             setIsLoading(false); // Loader stop
         }
     };
 
+
     // handle post actions
     const handlePostClick = (postId) => {
-        console.log("Clicked post with ID:", postId);
+        //console.log("Clicked post with ID:", postId);
     };
     const handleEdit = (postId) => {
-        console.log("Edit post with ID:", postId);
+        //console.log("Edit post with ID:", postId);
     };
     const handleDelete = (postId) => {
-        console.log("Delete post with ID:", postId);
+        //console.log("Delete post with ID:", postId);
     };
 
-    // debouncing on usernameAvailability
-    const debounceUsernameCheck = (
-        username,
-        setUsernameStatus,
-        setIsUsernameAvailable,
-        handleSubmitButtonState,
-        currentUsername
-    ) => {
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
-        debounceTimerRef.current = setTimeout(() => {
-            usernameAvailability(
-                username,
-                setUsernameStatus,
-                setIsUsernameAvailable,
-                handleSubmitButtonState,
-                currentUsername
-            );
-        }, 500);
+    // input change
+    const handleChange = (e) => {
+        setUsernameStatus("");
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    // username availability check
-    const usernameAvailability = async (
-        username,
-        setUsernameStatus,
-        setIsUsernameAvailable,
-        handleSubmitButtonState,
-        currentUsername
-    ) => {
-        if (!username) {
-            setUsernameStatus("❌ Enter valid Username !");
-            setIsUsernameAvailable(null);
-            handleSubmitButtonState(true);
-            return;
-        }
-
-        if (username === currentUsername) {
-            setUsernameStatus("✅ Username available !");
-            setIsUsernameAvailable(true);
-            handleSubmitButtonState(false);
-            return;
-        }
-
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("username", "==", username));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-            setUsernameStatus("✅ Username available !");
-            setIsUsernameAvailable(true);
-            handleSubmitButtonState(false);
-        } else {
-            setUsernameStatus("❌ Username not available !");
-            setIsUsernameAvailable(false);
-            handleSubmitButtonState(true);
-        }
-    };
 
     // toggle submit button
     const handleSubmitButtonState = (shouldDisable) => {
@@ -240,7 +221,7 @@ const ProfilePage = () => {
                     <p className="mt-4 text-white text-lg font-semibold animate-pulse tracking-wide">Loading...</p>
                 </div>
             )}
-            <div className="max-w-6xl mx-auto space-y-8">
+            <div className="max-w-6xl mx-auto py-6">
                 <div className="text-center">
                     <h1 className="text-3xl font-bold text-brand-orange mb-4">Profile Section</h1>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -251,7 +232,7 @@ const ProfilePage = () => {
                 <div className="bg-white dark:bg-dark-card rounded-xl shadow-xl p-6 md:p-8 flex flex-col md:flex-row gap-10">
                     {/* DP Section */}
                     <div className="flex flex-col items-center justify-center w-full md:w-1/3">
-                        <div className="relative group">
+                        <div className="relative flex flex-col items-center group">
                             <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-brand-orange shadow-lg group-hover:scale-105 transition-all duration-300">
                                 {image ? (
                                     <img
@@ -273,7 +254,7 @@ const ProfilePage = () => {
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a2 2 0 002 2h3m10-5V5a2 2 0 00-2-2H7a2 2 0 00-2 2v11a2 2 0 002 2h3l4 4 4-4h1a2 2 0 002-2z" />
                                 </svg>
-                                Upload New Photo
+                                Pick Profile Picture
                             </label>
                             <input
                                 type="file"
@@ -286,7 +267,8 @@ const ProfilePage = () => {
                             <p className="mt-2 text-sm text-gray-400 text-center italic">
                                 “A profile picture speaks before you do.”
                             </p>
-                            <div className="mt-4 flex gap-6 text-sm text-gray-600 dark:text-gray-300 font-medium">
+
+                            <div className="mt-4 flex gap-6 text-sm text-gray-600 dark:text-gray-300 font-medium justify-center">
                                 <div className="text-center">
                                     <span className="block text-lg font-bold">{userFollowers}</span>
                                     Followers
@@ -298,6 +280,7 @@ const ProfilePage = () => {
                             </div>
                         </div>
                     </div>
+
 
                     {/* Form Section */}
                     <form
@@ -314,41 +297,77 @@ const ProfilePage = () => {
                         ].map((field) => (
                             field.name === "username" ? (
 
-                                <div key={field.name} className="flex flex-col">
-                                    <label
-                                        htmlFor={field.name}
-                                        className="text-sm font-medium mb-1"
-                                    >
+                                <div key={field.name} className="flex flex-col relative">
+                                    <label htmlFor={field.name} className="text-sm font-medium mb-1">
                                         {field.label}
                                     </label>
+
                                     <input
                                         type={field.type || "text"}
                                         name={field.name}
                                         value={formData[field.name] || ""}
                                         onChange={(e) => {
+                                            const value = e.target.value.toLowerCase();
+                                            handleChange({ target: { name: e.target.name, value } });
 
+                                            // Username validation
+                                            if (field.name === "username") {
+                                                const specialCharMatch = value.match(/[^a-zA-Z0-9._]/);
+                                                const hasLetter = /[a-zA-Z]/.test(value);
+                                                const hasNumber = /[0-9]/.test(value);
+                                                const isBooleanish = ["0", "1", "true", "false"].includes(value);
 
-                                            handleChange(e);
-                                            debounceUsernameCheck(
-                                                e.target.value,
-                                                setUsernameStatus,
-                                                setIsUsernameAvailable,
-                                                handleSubmitButtonState,
-                                                currentUsername
-                                            );
+                                                if (specialCharMatch) {
+                                                    if (specialCharMatch[0] === " ") {
+                                                        setUsernameStatus(`Username can't contain space.`);
+                                                    } else {
+                                                        setUsernameStatus(`Username can't contain  '${specialCharMatch[0]}'`);
+                                                    }
+                                                    setIsUsernameAvailable(false);
+                                                    handleSubmitButtonState(true);
+                                                    return;
+                                                }
+
+                                                if (isBooleanish) {
+                                                    setUsernameStatus(`Username can't be '${value}'`);
+                                                    setIsUsernameAvailable(false);
+                                                    handleSubmitButtonState(true);
+                                                    return;
+                                                }
+
+                                                if (!hasLetter || !hasNumber) {
+                                                    setUsernameStatus("Username must include at least 1 letter and 1 number");
+                                                    setIsUsernameAvailable(false);
+                                                    handleSubmitButtonState(true);
+                                                    return;
+                                                }
+
+                                                // Valid
+                                                setUsernameStatus("");
+                                                setIsUsernameAvailable(null);
+                                                handleSubmitButtonState(false);
+                                            }
                                         }}
                                         disabled={field.disabled}
-                                        className="bg-light-card dark:bg-[#0c0c0c] border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-orange transition"
+                                        className={`bg-light-card dark:bg-[#0c0c0c] border ${usernameStatus && !isUsernameAvailable
+                                            ? "border-red-500"
+                                            : "border-gray-300 dark:border-gray-700"
+                                            } rounded-lg px-3 py-2 text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-orange transition`}
                                     />
+
                                     {usernameStatus && (
-                                        <span
-                                            className={`text-xs mt-1 ${isUsernameAvailable ? "text-green-600" : "text-red-500"
-                                                }`}
-                                        >
-                                            {usernameStatus}
-                                        </span>
+                                        <div className="flex items-center mt-1 text-xs text-red-500 gap-1">
+                                            <span>{usernameStatus}</span>
+                                            <div className="relative group">
+                                                <span className="cursor-default font-bold text-sm">ⓘ</span>
+                                                <div className="absolute w-max bottom-full mb-1 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 shadow-lg z-50">
+                                                    Only use letters (a–z), numbers (0–9), dot (.) and underscore (_). Avoid @, #, spaces, and boolean values.
+                                                </div>
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
+
                             ) : (
                                 <div key={field.name} className="flex flex-col">
                                     <label

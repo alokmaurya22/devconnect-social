@@ -10,24 +10,24 @@ import {
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { SidebarItem } from "./ImportantComponents";
-import { useGuestTimer } from "../../context/GuestTimerContext"; // 👈 import context
-import UploadDummyPosts from "../UploadDummyPosts"; // adjust path if needed
+import { useGuestTimer } from "../../context/GuestTimerContext";
+import UploadDummyPosts from "../UploadDummyPosts";
 
 
 const LeftSidebar = ({ onPostClick }) => {
-    const { isAuthenticated, openLoginModal, setShowTimer } = useGuestTimer(); // 👈 access states
+    const { isAuthenticated, openLoginModal, setShowTimer } = useGuestTimer();
 
     const handlePostClick = () => {
         if (!isAuthenticated) {
-            setShowTimer(false);       // 🚫 hide + pause timer
-            openLoginModal();          // 🔓 open login modal
+            setShowTimer(false);
+            openLoginModal();
         } else {
-            onPostClick();             // ✅ allow post modal
+            onPostClick();
         }
     };
 
     return (
-        <aside className="hidden md:flex flex-col w-1/5 space-y-6 pr-4 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-700 pt-10">
+        <aside className="hidden md:flex flex-col w-1/5 space-y-6 pr-4 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-700 pt-12">
             {/* Sidebar Nav Links */}
             <Link to="/home">
                 <SidebarItem icon={<FaHome />} label="Home" />
@@ -41,16 +41,17 @@ const LeftSidebar = ({ onPostClick }) => {
             <Link to="/chats">
                 <SidebarItem icon={<FaEnvelope />} label="Messages" />
             </Link>
-            <Link to="/user/Ptb2xNoRR1bzOD8DxqGZBeNjxvs2">
-                <SidebarItem icon={<FaBookmark />} label="Users" />
+            <Link to="/bookmarks">
+                <SidebarItem icon={<FaBookmark />} label="bookmarks" />
             </Link>
             <Link to="/profile">
                 <SidebarItem icon={<FaUser />} label="Profile" />
             </Link>
+            {/* 
             <Link to="/more">
                 <SidebarItem icon={<FaEllipsisH />} label="More" />
             </Link>
-
+            */}
             {/* ✅ POST BUTTON - triggers modal instead of page change */}
             <button
                 onClick={handlePostClick}

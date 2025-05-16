@@ -30,17 +30,17 @@ const CreatePostModel = ({ onClose }) => {
             const postId = await uploadPost({ title, content, tag, file, viewtype: viewType });
             const userId = sessionStorage.getItem("userID");
 
-            console.log("✅ Post Uploaded!");
-            console.log("Post ID:", postId);
-            console.log("User ID:", userId);
-            console.log("Post Data:", {
+            //console.log("✅ Post Uploaded!");
+            //console.log("Post ID:", postId);
+            //console.log("User ID:", userId);
+            {/* console.log("Post Data:", {
                 title,
                 content,
                 tag,
                 viewType,
                 mediaFile: file?.name || "None",
             });
-
+            */}
             alert("Post created successfully!");
             // Reset form
             setTitle("");

@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTheme } from "../context/ThemeContext";
-import { FaMoon, FaSun, FaSignOutAlt, FaSearch, FaTimes } from "react-icons/fa";
+import { FaMoon, FaSun, FaSearch, FaTimes } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import GuestTimerDisplay from "../context/GuestTimerDisplay";
 import { useGuestTimer } from "../context/GuestTimerContext";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../configuration/firebaseConfig";
 import { HiOutlineLogout } from "react-icons/hi";
+import { RxHamburgerMenu } from "react-icons/rx";
+import logo from "../assets/logo_new.png";
+import SidebarNavigation from "./homePageComponents/SidebarNavigation";
+import UploadDummyPosts from "./UploadDummyPosts";
+import { FaSignOutAlt, FaFire, FaUserPlus, FaUserLock, FaHome } from "react-icons/fa";
 
 const Navbar = () => {
     const { theme, toggleTheme } = useTheme();
@@ -18,11 +23,43 @@ const Navbar = () => {
     const [suggestions, setSuggestions] = useState([]);
     const [profileImageUrl, setProfileImageUrl] = useState(null);
     const searchRef = useRef(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const sidebarRef = useRef(null);
+    const hamburgerRef = useRef(null);
+
+    const toggleSidebar = () => {
+        setIsSidebarOpen(prev => !prev);
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                sidebarRef.current &&
+                !sidebarRef.current.contains(event.target) &&
+                hamburgerRef.current &&
+                !hamburgerRef.current.contains(event.target)
+            ) {
+                setIsSidebarOpen(false);
+            }
+        };
+
+        if (isSidebarOpen) {
+            document.addEventListener("click", handleClickOutside);
+        } else {
+            document.removeEventListener("click", handleClickOutside);
+        }
+
+        // Clean up when unmounting
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, [isSidebarOpen]);
 
     // 🔐 Logout
     const handleLogout = () => {
+        sessionStorage.clear();
         setIsAuthenticated(false);
-        sessionStorage.clear(); // clear session info
         navigate("/");
     };
 
@@ -42,8 +79,7 @@ const Navbar = () => {
 
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
-                //console.log(data);
-                // Check if the fullName or username contains the search term (case-insensitive)
+
                 if (
                     data.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     data.username.toLowerCase().includes(searchTerm.toLowerCase())
@@ -81,9 +117,10 @@ const Navbar = () => {
     );
 
     const handleSearchChange = (e) => setSearchTerm(e.target.value);
+
     const handleSearchSubmit = () => {
         if (searchTerm.trim() !== "") {
-            console.log("Search submitted:", searchTerm);
+            //console.log("Search submitted:", searchTerm);
         }
         setSuggestions([]);
     };
@@ -93,7 +130,7 @@ const Navbar = () => {
     const handleSuggestionClick = (suggestion) => {
         setSearchTerm(suggestion.name);
         setSuggestions([]);
-        console.log("User selected:", suggestion.name, "| ID:", suggestion.userid);
+        //console.log("User selected:", suggestion.name, "| ID:", suggestion.userid);
         // Use navigate to redirect to the UserProfilePage with the user's ID
         navigate(`/user/${suggestion.userid}`);
     };
@@ -111,13 +148,21 @@ const Navbar = () => {
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
-
-
-
     return (
-
         <nav className="w-full fixed top-0 left-0 z-50 px-6 md:px-12 py-4 flex justify-between items-center bg-transparent backdrop-blur-md">
-            <Link to="/" className="text-2xl font-bold text-brand-orange">Dev Connect</Link>
+            {/* Notice bar */}
+            {!isSidebarOpen && (
+                <div className="fixed top-[56px] left-0 w-full z-40 bg-yellow-400 text-black text-center py-1.5 text-sm font-semibold shadow-md">
+                    <span className="font-semibold text-xs sm:text-base text-center">
+                        Some features are under development. Stay tuned for updates!
+                    </span>
+                </div>
+            )}
+
+            <div className="relative group mr-1 sm:mr-4">
+                <img src={logo} alt="Logo" className="w-9 h-9 sm:w-9 sm:h-9 rounded-full object-cover" />
+            </div>
+            <Link to="/" className="text-xl sm:text-2xl font-bold text-brand-orange">Social Sphere</Link>
 
             {/* Middle: Search */}
             <div className="flex-1 mx-6 hidden md:flex justify-center relative">
@@ -129,9 +174,13 @@ const Navbar = () => {
                             <input
                                 type="text"
                                 value={searchTerm}
-                                onChange={handleSearchChange}
+                                onChange={(e) => {
+                                    const rawValue = e.target.value;
+                                    const cleanedValue = rawValue.startsWith('@') ? rawValue.slice(1) : rawValue;
+                                    handleSearchChange({ target: { value: cleanedValue } });
+                                }}
                                 onKeyDown={handleKeyDown}
-                                placeholder="Search DevConnect..."
+                                placeholder="Search ..."
                                 className="flex-grow bg-transparent outline-none text-sm text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                             />
                             {searchTerm && (
@@ -166,7 +215,7 @@ const Navbar = () => {
                     <>
                         <Link
                             to="/login"
-                            className={`px-4 py-1.5 rounded font-semibold transition ${isLogin
+                            className={`px-3 sm:px-4 py-1 sm:py-1.5 text-sm sm:text-base rounded font-semibold transition ${isLogin
                                 ? "bg-brand-orange text-white"
                                 : "bg-white text-brand-orange border border-brand-orange hover:bg-light-card"
                                 }`}
@@ -175,7 +224,7 @@ const Navbar = () => {
                         </Link>
                         <Link
                             to="/signup"
-                            className={`px-4 py-1.5 rounded font-semibold transition ${isSignup
+                            className={`hidden md:inline-block px-3 sm:px-4 py-1 sm:py-1.5 text-sm sm:text-base rounded font-semibold transition ${isSignup
                                 ? "bg-brand-orange text-white"
                                 : "bg-white text-brand-orange border border-brand-orange hover:bg-light-card"
                                 }`}
@@ -200,7 +249,7 @@ const Navbar = () => {
                             </Link>
                             <Tooltip label="Profile" />
                         </div>
-                        <div className="relative group">
+                        <div className="relative group hidden sm:block">
                             <button onClick={handleLogout}>
                                 <HiOutlineLogout className="text-3xl text-brand-orange hover:scale-110 transition" />
                             </button>
@@ -218,8 +267,86 @@ const Navbar = () => {
                     </button>
                     <Tooltip label={theme === "dark" ? "Light Mode" : "Dark Mode"} />
                 </div>
+
+
+                {/* 🟠 Hamburger for mobile only */}
+                <button
+                    ref={hamburgerRef}
+                    className="block md:hidden text-2xl text-brand-orange mr-2"
+                    onClick={toggleSidebar}
+                    aria-label="Open Sidebar"
+                >
+                    <RxHamburgerMenu />
+                </button>
             </div>
-        </nav>
+            {isSidebarOpen && (
+                <div
+                    ref={sidebarRef}
+                    className="absolute top-full left-0 w-full bg-white/80 dark:bg-dark-card/80 backdrop-blur-md flex-col items-start p-4 md:hidden z-40"
+                >
+                    {!isAuthenticated ? (
+                        <>
+                            <Link
+                                to="/"
+                                className="w-full py-2 text-left text-brand-orange font-semibold px-4 flex items-center gap-2 text-lg"
+                                onClick={() => setIsSidebarOpen(false)}
+                            >
+                                <FaHome className="text-xl" />
+                                &nbsp;Home
+                            </Link>
+                            <Link
+                                to="/login"
+                                className="w-full py-2 text-left text-brand-orange font-semibold px-4 flex items-center gap-2 text-lg"
+                                onClick={() => setIsSidebarOpen(false)}
+                            >
+                                <FaUserLock className="text-xl" />
+                                &nbsp;Login
+                            </Link>
+                            <Link
+                                to="/signup"
+                                className="w-full py-2 text-left text-brand-orange font-semibold px-4 flex items-center gap-2 text-lg"
+                                onClick={() => setIsSidebarOpen(false)}
+                            >
+                                <FaUserPlus className="text-xl" />
+                                &nbsp;SignUp
+                            </Link>
+                        </>
+                    ) : (
+                        <>
+                            <SidebarNavigation
+                                onClick={() => setIsSidebarOpen(false)}
+                                setIsAuthenticated={setIsAuthenticated}
+                                itemClass="w-full py-2 text-left text-brand-orange font-semibold px-4"
+                                wrapperClass="flex flex-col items-start"
+                            />
+                            <Link
+                                to="/trending"
+                                className="w-full py-2 text-left text-brand-orange font-semibold px-4 flex items-center gap-2 text-lg"
+                                onClick={() => setIsSidebarOpen(false)}
+                            >
+                                <FaFire className="text-xl" />
+                                &nbsp;Trending
+                            </Link>
+                            <button
+                                onClick={() => {
+                                    handleLogout();
+                                    setIsSidebarOpen(false);
+                                }}
+                                className="w-full py-2 text-left text-brand-orange font-semibold px-5 flex items-center gap-2 text-lg"
+                            >
+                                <FaSignOutAlt className="text-xl" />
+                                &nbsp;Logout
+                            </button>
+
+                        </>
+                    )}
+                </div>
+            )}
+
+
+
+        </nav >
+
     );
 };
 
