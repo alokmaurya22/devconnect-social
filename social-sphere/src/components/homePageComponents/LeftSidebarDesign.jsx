@@ -18,7 +18,7 @@ const LeftSidebarDesign = ({ onPostClick }) => {
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className="hidden md:flex flex-col w-1/5 space-y-6 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-700 pt-14 px-4">
+            <aside className="hidden md:flex flex-col w-1/5 space-y-6 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-700 pt-10 px-4">
                 <SidebarNavigation
                     itemClass="w-full py-2 text-left font-medium"
                     wrapperClass="flex flex-col items-start"
