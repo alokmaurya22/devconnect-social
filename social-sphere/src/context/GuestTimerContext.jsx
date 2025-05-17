@@ -7,7 +7,7 @@ const GuestTimerContext = createContext();
 export const GuestTimerProvider = ({ children }) => {
     const location = useLocation();
 
-    const guestTimerDuration = 300; // ⏱️ Customize timer duration
+    const guestTimerDuration = 300; // Customize timer duration
     const [secondsLeft, setSecondsLeft] = useState(guestTimerDuration);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [showTimer, setShowTimer] = useState(true);
@@ -18,7 +18,7 @@ export const GuestTimerProvider = ({ children }) => {
 
     const [timerActive, setTimerActive] = useState(true);
 
-    // ⏸️ Pause timer on /login and /signup
+    //  Pause timer on /login and /signup
     useEffect(() => {
         if (isAuthPage || isAuthenticated || !showTimer) {
             setTimerActive(false);
@@ -27,7 +27,7 @@ export const GuestTimerProvider = ({ children }) => {
         }
     }, [location.pathname, isAuthenticated, showTimer]);
 
-    // ⏱️ Countdown logic
+    // Countdown logic
     useEffect(() => {
         if (!timerActive) return;
 
@@ -35,7 +35,7 @@ export const GuestTimerProvider = ({ children }) => {
             setSecondsLeft((prev) => {
                 if (prev <= 1) {
                     clearInterval(timer);
-                    setShowLoginPopup(true); // 💥 Timer ends => show modal
+                    setShowLoginPopup(true);
                     return 0;
                 }
                 return prev - 1;

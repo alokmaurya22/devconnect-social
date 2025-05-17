@@ -124,8 +124,26 @@ const Navbar = () => {
             <div className="flex items-center space-x-4 mb-1 sm:mb-0">
                 {!isAuthenticated ? (
                     <>
-                        <Link to="/login" className={`px-3 py-1 text-sm rounded font-semibold transition ${isLogin ? "bg-brand-orange text-white" : "bg-white text-brand-orange border border-brand-orange hover:bg-brand-orange  dark:bg-black dark:text-white hover:text-white dark:hover:bg-brand-orange"} `}>Login</Link>
-                        <Link to="/signup" className={`hidden md:inline-block px-3 py-1 text-sm rounded font-semibold transition ${isSignup ? "bg-brand-orange text-white" : "bg-white text-brand-orange border border-brand-orange hover:bg-brand-orange hover:text-white dark:bg-black dark:text-white  dark:hover:bg-brand-orange"}`}>Sign Up</Link>
+                        <Link
+                            to="/login"
+                            className={`hidden md:inline-block px-3 py-1 text-sm rounded font-semibold transition ${isLogin
+                                    ? "bg-brand-orange text-white"
+                                    : "bg-white text-brand-orange border border-brand-orange hover:bg-brand-orange hover:text-white dark:bg-black dark:text-white dark:hover:bg-brand-orange"
+                                }`}
+                        >
+                            Login
+                        </Link>
+
+                        <Link
+                            to="/signup"
+                            className={`hidden md:inline-block px-3 py-1 text-sm rounded font-semibold transition ${isSignup
+                                    ? "bg-brand-orange text-white"
+                                    : "bg-white text-brand-orange border border-brand-orange hover:bg-brand-orange hover:text-white dark:bg-black dark:text-white dark:hover:bg-brand-orange"
+                                }`}
+                        >
+                            Sign Up
+                        </Link>
+
                     </>
                 ) : (
                     <>

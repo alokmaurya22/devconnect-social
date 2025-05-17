@@ -10,12 +10,12 @@ const ProtectedRoute = ({ element, allowedRoutes = [] }) => {
 
     useEffect(() => {
         if (allowedRoutes.includes(currentPath)) {
-            setShowElement(true); // ✅ Always allow public routes
+            setShowElement(true);
         } else if (!isAuthenticated) {
-            openLoginModal();     // ✅ Now safe to call
             setShowElement(false);
+            openLoginModal();
         } else {
-            setShowElement(true); // ✅ Authenticated
+            setShowElement(true);
         }
     }, [isAuthenticated, currentPath, openLoginModal, allowedRoutes]);
 

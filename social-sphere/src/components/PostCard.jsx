@@ -74,7 +74,6 @@ const PostCard = ({ post }) => {
     const handleLikeClick = () => {
         if (!isAuthenticated) {
             openLoginModal();
-            setShowTimer(false);
             return;
         } else {
             setLiked(prev => !prev);
@@ -86,7 +85,6 @@ const PostCard = ({ post }) => {
     const handleSaveClick = () => {
         if (!isAuthenticated) {
             openLoginModal();
-            setShowTimer(false);
             return;
         } else {
             setSaved(prev => !prev);
@@ -97,7 +95,6 @@ const PostCard = ({ post }) => {
     const handleAction = async (actionName) => {
         if (!isAuthenticated) {
             openLoginModal();
-            setShowTimer(false);
             return;
         }
 

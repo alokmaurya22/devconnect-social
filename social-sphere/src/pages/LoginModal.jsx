@@ -3,16 +3,27 @@ import { createPortal } from "react-dom";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../utils/authFunctions";
+import { useGuestTimer } from "../context/GuestTimerContext";
 
 const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [message, setMessage] = useState("");
+    const { setShowTimer } = useGuestTimer();
+    const navigate = useNavigate();
 
     if (!isOpen) return null;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleClose = () => {
+        navigate("/", { replace: true });
+        setTimeout(() => {
+            onClose();
+            setShowTimer(true);
+        }, 20);
     };
 
     const handleSubmit = (e) => {
@@ -23,11 +34,10 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
             () => {
                 onLoginSuccess();
                 setMessage("Logged in successfully!");
-                onClose();
+                handleClose();
                 setTimeout(() => setMessage(""), 3000);
             },
             (errorMessage) => {
-                //console.log("❌ " + errorMessage);
                 setMessage("❌ Something went wrong!");
                 setTimeout(() => setMessage(""), 4000);
             }
@@ -42,7 +52,7 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
                     {/* ❌ Close Button */}
                     <button
                         className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-brand-orange"
-                        onClick={onClose}
+                        onClick={handleClose}
                         aria-label="Close"
                     >
                         &times;
@@ -115,7 +125,7 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
                         Don&apos;t have an account?{" "}
                         <Link
                             to="/signup"
-                            onClick={onClose}
+                            onClick={handleClose}
                             className="text-brand-orange hover:underline cursor-pointer"
                         >
                             Sign Up
