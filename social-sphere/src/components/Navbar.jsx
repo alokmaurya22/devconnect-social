@@ -168,13 +168,13 @@ const Navbar = () => {
                 <div ref={sidebarRef} className="absolute top-full left-0 w-full bg-white/80 dark:bg-dark-card/80 backdrop-blur-md flex-col items-start p-4 md:hidden z-40">
                     {!isAuthenticated ? (
                         <>
-                            <Link to="/" className="w-full py-2 px-4 text-brand-orange font-semibold flex items-center gap-2">
+                            <Link to="/" onClick={() => setIsSidebarOpen(false)} className="w-full py-2 px-4 text-brand-orange font-semibold flex items-center gap-2">
                                 <FaHome className="text-xl" /> Home
                             </Link>
-                            <Link to="/login" className="w-full py-2 px-4 text-brand-orange font-semibold flex items-center gap-2">
+                            <Link to="/login" onClick={() => setIsSidebarOpen(false)} className="w-full py-2 px-4 text-brand-orange font-semibold flex items-center gap-2">
                                 <FaUserLock className="text-xl" /> Login
                             </Link>
-                            <Link to="/signup" className="w-full py-2 px-4 text-brand-orange font-semibold flex items-center gap-2">
+                            <Link to="/signup" onClick={() => setIsSidebarOpen(false)} className="w-full py-2 px-4 text-brand-orange font-semibold flex items-center gap-2">
                                 <FaUserPlus className="text-xl" /> SignUp
                             </Link>
                         </>
@@ -186,8 +186,13 @@ const Navbar = () => {
                                 itemClass="w-full py-2 px-4 text-left text-brand-orange font-semibold"
                                 wrapperClass="flex flex-col items-start"
                             />
-                            <Link to="/trending" className="w-full py-2 px-4 text-brand-orange font-semibold flex items-center gap-2">
-                                <FaFire className="text-xl" /> Trending
+                            <Link
+                                to="/trending"
+                                onClick={() => setIsSidebarOpen(false)}
+                                className="w-full py-2 px-4 text-brand-orange font-semibold flex items-center gap-2"
+                            >
+                                <FaFire className="text-xl" />
+                                Trending
                             </Link>
                             <button onClick={() => { handleLogout(); setIsSidebarOpen(false); }} className="w-full py-2 px-5 text-brand-orange font-semibold flex items-center gap-2">
                                 <FaSignOutAlt className="text-xl" /> Logout

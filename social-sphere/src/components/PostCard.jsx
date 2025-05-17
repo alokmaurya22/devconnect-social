@@ -64,8 +64,8 @@ const PostCard = ({ post }) => {
     };
 
     const handleLikeClick = () => {
-        setLiked(prev => !prev); // toggle the local liked state
-        handleAction("Like"); // jo tumhara backend/parent function hai wo bhi call karo
+        setLiked(prev => !prev);
+        handleAction("Like");
     };
 
     const handleAction = async (actionName) => {
@@ -211,10 +211,6 @@ const PostCard = ({ post }) => {
 
                         <span>{/*actionCounts.saves*/}</span>
                     </button>
-
-
-
-
                     <button
                         onClick={() => handleAction("Comment1")}
                         className="flex items-center gap-1 hover:text-blue-500 transition"

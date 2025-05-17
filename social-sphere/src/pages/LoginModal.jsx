@@ -21,10 +21,10 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
         loginUser(
             formData,
             () => {
-                // ✅ On successful login
+                //  On successful login
                 onLoginSuccess();
-                setMessage("✅ Logged in successfully!");
-                onClose(); // ✅ Close the modal
+                setMessage(" Logged in successfully!");
+                onClose(); //  Close the modal
                 setTimeout(() => setMessage(""), 3000);
             },
             (errorMessage) => {
@@ -36,14 +36,14 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     };
 
     return createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-md">
-            <div className="w-full max-w-md px-4">
-                <div className="w-full bg-white dark:bg-dark-card rounded-2xl shadow-xl p-8 sm:p-10">
-                    <h2 className="text-3xl font-bold text-brand-orange mb-6 text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-md px-2 sm:px-4">
+            <div className="w-full max-w-sm sm:max-w-md">
+                <div className="w-full bg-white dark:bg-dark-card rounded-2xl shadow-xl p-6 sm:p-10">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-brand-orange mb-6 text-center">
                         Login to continue..
                     </h2>
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
                         {/* Email */}
                         <div>
                             <label className="block mb-1 text-sm font-semibold text-black dark:text-white">Email</label>
@@ -76,7 +76,7 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
                         <div className="flex items-center justify-center">
                             <button
                                 type="button"
-                                className="flex items-center gap-3 px-5 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-light-card dark:bg-[#0c0c0c] hover:border-brand-orange hover:bg-white dark:hover:bg-[#1a1a1a] transition w-full justify-center"
+                                className="flex items-center gap-3 px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-light-card dark:bg-[#0c0c0c] hover:border-brand-orange hover:bg-white dark:hover:bg-[#1a1a1a] transition w-full justify-center"
                             >
                                 <FcGoogle className="text-xl" />
                                 <span className="text-sm font-medium text-black dark:text-white">
