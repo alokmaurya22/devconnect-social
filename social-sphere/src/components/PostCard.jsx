@@ -33,6 +33,14 @@ const PostCard = ({ post }) => {
         }
     }, [actionStatus.liked])
 
+
+    const [saved, setSaved] = useState(actionStatus.saved || false);
+    useEffect(() => {
+        if (actionStatus.saved) {
+            setSaved(true);
+        }
+    }, [actionStatus.saved])
+
     const currentUserId = sessionStorage.getItem("userID");
     const navigate = useNavigate();
 
@@ -66,6 +74,11 @@ const PostCard = ({ post }) => {
     const handleLikeClick = () => {
         setLiked(prev => !prev);
         handleAction("Like");
+    };
+
+    const handleSaveClick = () => {
+        setSaved(prev => !prev);
+        handleAction("Save");
     };
 
     const handleAction = async (actionName) => {
@@ -227,10 +240,9 @@ const PostCard = ({ post }) => {
                         <span>Share</span>
                     </button>
                 </div>
-
                 <button
-                    onClick={() => handleAction("Save")}
-                    className={`flex items-center gap-1 transition ${actionStatus.saved ? "text-yellow-500" : "hover:text-yellow-500"}`}
+                    onClick={handleSaveClick}
+                    className={`flex items-center gap-1 transition ${saved ? "text-blue-600 dark:text-yellow-600" : "hover:text-blue-500 dark:hover:text-yellow-500"}`}
                 >
                     <FaBookmark className="text-base" />
                     <span>Save</span>
