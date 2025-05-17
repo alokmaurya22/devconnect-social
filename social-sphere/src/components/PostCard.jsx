@@ -72,13 +72,26 @@ const PostCard = ({ post }) => {
     };
 
     const handleLikeClick = () => {
-        setLiked(prev => !prev);
-        handleAction("Like");
+        if (!isAuthenticated) {
+            openLoginModal();
+            setShowTimer(false);
+            return;
+        } else {
+            setLiked(prev => !prev);
+            handleAction("Like");
+        }
+
     };
 
     const handleSaveClick = () => {
-        setSaved(prev => !prev);
-        handleAction("Save");
+        if (!isAuthenticated) {
+            openLoginModal();
+            setShowTimer(false);
+            return;
+        } else {
+            setSaved(prev => !prev);
+            handleAction("Save");
+        }
     };
 
     const handleAction = async (actionName) => {

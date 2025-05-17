@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "react-router-dom";
-import { loginUser } from "../utils/authFunctions"; // ✅ Real login function
+import { Link, useNavigate } from "react-router-dom";
+import { loginUser } from "../utils/authFunctions";
 
 const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [message, setMessage] = useState("");
+    const navigate = useNavigate();
 
     if (!isOpen) return null;
 
@@ -21,14 +22,12 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
         loginUser(
             formData,
             () => {
-                //  On successful login
                 onLoginSuccess();
-                setMessage(" Logged in successfully!");
-                onClose(); //  Close the modal
+                setMessage("Logged in successfully!");
+                onClose();
                 setTimeout(() => setMessage(""), 3000);
             },
             (errorMessage) => {
-                // ❌ On error
                 setMessage("❌ " + errorMessage);
                 setTimeout(() => setMessage(""), 4000);
             }
@@ -38,7 +37,17 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     return createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-md px-2 sm:px-4">
             <div className="w-full max-w-sm sm:max-w-md">
-                <div className="w-full bg-white dark:bg-dark-card rounded-2xl shadow-xl p-6 sm:p-10">
+                <div className="w-full bg-white dark:bg-dark-card rounded-2xl shadow-xl p-6 sm:p-10 relative">
+
+                    {/* ❌ Close Button */}
+                    <button
+                        className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-brand-orange"
+                        onClick={onClose}
+                        aria-label="Close"
+                    >
+                        &times;
+                    </button>
+
                     <h2 className="text-2xl sm:text-3xl font-bold text-brand-orange mb-6 text-center">
                         Login to continue..
                     </h2>
@@ -104,12 +113,13 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
                     {/* Sign up redirect */}
                     <p className="text-sm mt-5 text-center text-black dark:text-white">
                         Don&apos;t have an account?{" "}
-                        <span
+                        <Link
+                            to="/signup"
+                            onClick={onClose}
                             className="text-brand-orange hover:underline cursor-pointer"
-                            onClick={() => (window.location.href = "/signup")}
                         >
                             Sign Up
-                        </span>
+                        </Link>
                     </p>
                 </div>
             </div>
@@ -117,4 +127,5 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
         document.getElementById("modal-root")
     );
 };
+
 export default LoginModal;
