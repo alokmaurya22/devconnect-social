@@ -20,7 +20,7 @@ const UploadDummyPosts = () => {
             "Unit tests finally passed ✅",
             "Clean code feels so satisfying 🧼",
             "Working on animations now ✨",
-            "Trying to fix merge conflicts 😭",
+            "Trying to fix merge conflicts all😭",
             "Pushed a fix at 3AM 😴",
             "GraphQL is pretty neat 🧬",
             "Handling auth states be like... 🔐",
