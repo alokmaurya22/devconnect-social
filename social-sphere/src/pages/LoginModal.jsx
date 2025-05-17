@@ -7,7 +7,6 @@ import { loginUser } from "../utils/authFunctions";
 const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [message, setMessage] = useState("");
-    const navigate = useNavigate();
 
     if (!isOpen) return null;
 
@@ -28,7 +27,8 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
                 setTimeout(() => setMessage(""), 3000);
             },
             (errorMessage) => {
-                setMessage("❌ " + errorMessage);
+                //console.log("❌ " + errorMessage);
+                setMessage("❌ Something went wrong!");
                 setTimeout(() => setMessage(""), 4000);
             }
         );
