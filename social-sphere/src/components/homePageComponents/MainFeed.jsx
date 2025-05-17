@@ -32,8 +32,7 @@ const MainFeed = ({ onPostClick }) => {
 
             {/* Spacer */}
             <div className="h-20"></div>
-            {/* 🔘 Create Post Button (Mobile Only) */}
-            {/* Create Post Button - only for mobile */}
+            {/* Create Post Button (Mobile View) */}
             <div className="fixed bottom-14 right-4 md:hidden z-50 group">
                 <button
                     onClick={onPostClick}
@@ -41,10 +40,6 @@ const MainFeed = ({ onPostClick }) => {
                     aria-label="Create Post"
                 >
                     +
-                    {/* Tooltip */}
-                    <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-gray-700 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
-                        Create Post
-                    </span>
                 </button>
             </div>
 
