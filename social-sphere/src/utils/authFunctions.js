@@ -6,7 +6,7 @@ import { auth, db } from "../configuration/firebaseConfig";
 
 // Helper function to generate a unique username based on fullName and timestamp
 const generateUsername = (fullName) => {
-    const trimmedName = fullName.trim().replace(/\s+/g, '_'); // Remove spaces and replace with underscores
+    const trimmedName = fullName.trim().replace(/\s+/g, '_').toLowerCase(); // Remove spaces and replace with underscores
     const timestamp = new Date().getTime(); // Use current timestamp
     return `${trimmedName}${timestamp}`;
 };
