@@ -56,10 +56,10 @@ const Feed = ({ activeTab }) => {
                     // Tab ke hisaab se filter lagana
                     const shouldAdd =
                         activeTab === "foryou"
-                            ? data.viewType === "EveryOne" // har user ke liye visible
-                            : data.viewType === "Followers" &&
-                            Array.isArray(userData.followers) &&
-                            userData.followers.includes(currentUserId); // sirf followers ke liye
+                            ? data.viewType === "EveryOne"
+                            : (["Followers", "FriendsOnly"].includes(data.viewType) &&
+                                Array.isArray(userData.followers) &&
+                                userData.followers.includes(currentUserId));
 
                     if (shouldAdd) {
                         return {

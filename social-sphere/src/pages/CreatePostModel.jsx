@@ -37,7 +37,7 @@ const CreatePostModel = ({ onClose }) => {
             setViewType("EveryOne");
             onClose();
         } catch (error) {
-            console.error("❌ Error creating post:", error);
+            console.error(" Error creating post:", error);
             alert("Failed to create post. Please try again.");
         } finally {
             setIsLoading(false);

@@ -82,7 +82,7 @@ const PostCard = ({ post }) => {
 
                 setActionStatus((prev) => ({
                     ...prev,
-                    liked, // 👈 Ye turant local state update karega
+                    liked, //  Ye turant local state update karega
                 }));
                 setActionCounts((prev) => ({
                     ...prev,
@@ -140,7 +140,7 @@ const PostCard = ({ post }) => {
         ? timeAgo(post.createdAt.toDate())
         : "Just now";
 
-    //console.log("actionCounts: ", actionCounts);
+    //console.log("Post: ", post);
 
 
     return (
@@ -158,9 +158,9 @@ const PostCard = ({ post }) => {
                         <FaUserCircle className="text-2xl text-gray-500 dark:text-gray-300" />
                     )}
                     <h3 className="font-semibold text-brand-orange">
-                        {post.fullName}
+                        {post.fullName} {/*post.userId*/}
                         <span className="block text-blue-900 dark:text-blue-400 text-xs mt-0">
-                            @{post.username}
+                            @{post.username}{/*post.id*/}
                         </span>
                     </h3>
                     {showFollowButton && (
