@@ -80,7 +80,7 @@ const Navbar = () => {
                 </div>
             )}
 
-            <Link to="./" className="relative group mr-2 sm:mr-4">
+            <Link to="./" className="relative group mr-3 sm:mr-4">
                 <img
                     src={logo}
                     alt="Logo"
@@ -101,7 +101,7 @@ const Navbar = () => {
             {!isAuthenticated && (
                 <Link
                     to="/"
-                    className="text-xl sm:text-2xl font-bold text-brand-orange block md:hidden"
+                    className="text-xl sm:text-2xl font-bold text-brand-orange block md:hidden mb-2"
                 >
                     Social Sphere
                 </Link>
@@ -121,11 +121,11 @@ const Navbar = () => {
 
 
             {/* Right */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 mb-1 sm:mb-0">
                 {!isAuthenticated ? (
                     <>
-                        <Link to="/login" className={`px-3 py-1 text-sm rounded font-semibold transition ${isLogin ? "bg-brand-orange text-white" : "bg-white text-brand-orange border border-brand-orange hover:bg-light-card"}`}>Login</Link>
-                        <Link to="/signup" className={`hidden md:inline-block px-3 py-1 text-sm rounded font-semibold transition ${isSignup ? "bg-brand-orange text-white" : "bg-white text-brand-orange border border-brand-orange hover:bg-light-card"}`}>Sign Up</Link>
+                        <Link to="/login" className={`px-3 py-1 text-sm rounded font-semibold transition ${isLogin ? "bg-brand-orange text-white" : "bg-white text-brand-orange border border-brand-orange hover:bg-brand-orange hover:text-white"} dark:bg-black dark:text-white hover:bg-brand-orange hover:text-white dark:hover:bg-brand-orange`}>Login</Link>
+                        <Link to="/signup" className={`hidden md:inline-block px-3 py-1 text-sm rounded font-semibold transition ${isSignup ? "bg-brand-orange text-white" : "bg-white text-brand-orange border border-brand-orange hover:bg-brand-orange hover:text-white"} dark:bg-black dark:text-white hover:bg-brand-orange hover:text-white dark:hover:bg-brand-orange`}>Sign Up</Link>
                     </>
                 ) : (
                     <>
@@ -146,19 +146,19 @@ const Navbar = () => {
 
                         <div className="relative group hidden sm:block">
                             <button onClick={handleLogout}>
-                                <FaSignOutAlt className="text-3xl text-brand-orange hover:scale-110 transition" />
+                                <FaSignOutAlt className="text-2xl text-brand-orange hover:scale-110 transition mt-1.5" />
                             </button>
                             <Tooltip label="Logout" />
                         </div>
                     </>
                 )}
                 <div className="relative group">
-                    <button onClick={toggleTheme} className="text-brand-orange text-2xl hover:scale-110 transition mb-2 sm:mb-1">
+                    <button onClick={toggleTheme} className="text-brand-orange text-2xl hover:scale-110 transition mt-1.5 sm:mt-1">
                         {theme === "dark" ? <FaSun /> : <FaMoon />}
                     </button>
                     <Tooltip label={theme === "dark" ? "Light Mode" : "Dark Mode"} />
                 </div>
-                <button ref={hamburgerRef} className="block md:hidden text-2xl text-brand-orange mr-2 mb-2" onClick={toggleSidebar}>
+                <button ref={hamburgerRef} className="block md:hidden text-2xl text-brand-orange mr-2 " onClick={toggleSidebar}>
                     <RxHamburgerMenu />
                 </button>
             </div>
