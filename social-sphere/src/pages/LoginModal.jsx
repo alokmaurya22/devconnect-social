@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { FcGoogle } from "react-icons/fc";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../utils/authFunctions";
 import { useGuestTimer } from "../context/GuestTimerContext";
@@ -8,10 +9,10 @@ import { useGuestTimer } from "../context/GuestTimerContext";
 const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [message, setMessage] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const { setShowTimer, secondsLeft } = useGuestTimer();
     const navigate = useNavigate();
 
-    //console.log("Seconds Left:", secondsLeft);
     if (!isOpen) return null;
 
     const handleChange = (e) => {
@@ -81,17 +82,25 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
                         </div>
 
                         {/* Password */}
-                        <div>
+                        <div className="relative">
                             <label className="block text-sm font-semibold text-black dark:text-white">Password</label>
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
                                 placeholder="••••••••"
-                                className="w-full px-4 py-2.5 rounded-lg bg-light-card dark:bg-[#0c0c0c] border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-orange hover:border-brand-orange transition text-sm text-black dark:text-white"
+                                className="w-full px-4 py-2.5 pr-11 rounded-lg bg-light-card dark:bg-[#0c0c0c] border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-orange hover:border-brand-orange transition text-sm text-black dark:text-white"
                                 required
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword((prev) => !prev)}
+                                className="absolute top-9 right-3 text-gray-500 hover:text-brand-orange"
+                                tabIndex={-1}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
                         </div>
 
                         {/* Google Login */}

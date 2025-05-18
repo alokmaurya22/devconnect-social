@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useGuestTimer } from "../context/GuestTimerContext";
-import { loginUser } from "../utils/authFunctions"; // ✅ Import login function
+import { loginUser } from "../utils/authFunctions";
 
 const Login = () => {
     const navigate = useNavigate();
     const { setIsAuthenticated, setShowTimer } = useGuestTimer();
+    const [message, setMessage] = useState("");
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
+
+    const [showPassword, setShowPassword] = useState(false); // <-- added
 
     useEffect(() => {
         setShowTimer(false);
@@ -29,10 +34,13 @@ const Login = () => {
             () => {
                 setIsAuthenticated(true);
                 setShowTimer(false);
+                setMessage("Logged in successfully!");
                 navigate("/home");
             },
             (errorMessage) => {
-                alert("Login failed: " + errorMessage);
+                console.error("Login error:", errorMessage);
+                setMessage("❌ Something went wrong!");
+                //alert("Login failed: " + errorMessage);
             }
         );
     };
@@ -59,18 +67,26 @@ const Login = () => {
                         />
                     </div>
 
-                    {/* Password */}
-                    <div>
+                    {/* Password with show/hide */}
+                    <div className="relative">
                         <label className="block mb-1 text-sm font-semibold">Password</label>
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"} // toggle type
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
                             placeholder="••••••••"
-                            className="w-full px-4 py-2.5 rounded-lg bg-light-card dark:bg-[#0c0c0c] border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-orange hover:border-brand-orange transition text-sm"
+                            className="w-full px-4 py-2.5 rounded-lg bg-light-card dark:bg-[#0c0c0c] border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-orange hover:border-brand-orange transition text-sm pr-10"
                             required
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="absolute top-9 right-3 text-gray-500 hover:text-brand-orange"
+                            tabIndex={-1}
+                        >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </button>
                     </div>
 
                     {/* Google Login */}
@@ -94,6 +110,12 @@ const Login = () => {
                         Login
                     </button>
                 </form>
+                {/* Response Message */}
+                {message && (
+                    <p className="mt-4 text-center text-sm font-medium text-green-600 dark:text-green-400">
+                        {message}
+                    </p>
+                )}
 
                 {/* Sign up redirect */}
                 <p className="text-sm mt-5 text-center text-black dark:text-white">

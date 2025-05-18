@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useGuestTimer } from "../context/GuestTimerContext";
 import { signUpUser } from "../utils/authFunctions";
 
@@ -9,36 +10,34 @@ const SignUp = () => {
     const { setShowTimer, setIsAuthenticated } = useGuestTimer();
 
     useEffect(() => {
-        setShowTimer(false); // Page khulte hi timer hatao
+        setShowTimer(false);
     }, [setShowTimer]);
 
     const [formData, setFormData] = useState({
-        fullName: '', // Changed from 'name' to 'fullName'
+        fullName: '',
         email: '',
         password: '',
     });
 
-    const [errorMessage, setErrorMessage] = useState(''); // Renamed to 'errorMessage'
+    const [errorMessage, setErrorMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false); // 👁️
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
-        // Pass the formData to signUpUser
         signUpUser(
             formData,
             () => {
-                // Success callback
                 console.log("User signed up successfully!");
                 setIsAuthenticated(true);
                 setShowTimer(false);
                 navigate("/home");
             },
             (error) => {
-                // Error callback
-                setErrorMessage(error); // Set error message
                 console.error("Signup error:", error);
+                setErrorMessage("Signup failed. Please try again");
             }
         );
 
@@ -86,18 +85,26 @@ const SignUp = () => {
                         />
                     </div>
 
-                    {/* Password */}
-                    <div>
+                    {/* Password with Toggle */}
+                    <div className="relative">
                         <label className="block mb-1 text-sm font-medium">Password</label>
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
                             placeholder="••••••••"
-                            className="w-full px-4 py-2.5 rounded bg-light-card dark:bg-[#0c0c0c] border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-orange text-sm"
+                            className="w-full px-4 py-2.5 pr-10 rounded bg-light-card dark:bg-[#0c0c0c] border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-orange text-sm"
                             required
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-[39px] text-gray-600 dark:text-gray-400 hover:text-brand-orange hover:dark:text-brand-orange-hover transition"
+                            tabIndex={-1}
+                        >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </button>
                     </div>
 
                     {/* Error Message */}
@@ -136,7 +143,6 @@ const SignUp = () => {
                 </p>
             </div>
         </div>
-
     );
 };
 

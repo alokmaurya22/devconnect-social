@@ -23,7 +23,7 @@ const AppRoutes = () => {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/user/:userId" element={<UserProfilePage />} />
 
-            {/* Protected routes */}
+            {/* Protected routes access after login */}
             <Route path="/home" element={<ProtectedRoute element={<Home />} allowedRoutes={allowedRoutes} />} />
             <Route path="/createPost" element={<ProtectedRoute element={<CreatePost />} allowedRoutes={allowedRoutes} />} />
             <Route path="/chats" element={<ProtectedRoute element={<Chats />} allowedRoutes={allowedRoutes} />} />
