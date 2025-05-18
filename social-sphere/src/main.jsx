@@ -5,7 +5,6 @@ import './index.css';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { GuestTimerProvider } from './context/GuestTimerContext';
-import Footer from './components/Footer';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>

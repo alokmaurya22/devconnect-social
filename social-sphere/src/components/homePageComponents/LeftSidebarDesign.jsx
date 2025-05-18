@@ -18,16 +18,17 @@ const LeftSidebarDesign = ({ onPostClick }) => {
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className="hidden md:flex flex-col w-1/5 space-y-6 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-700 pt-10 px-4">
+            <aside className="w-full md:flex flex-col md:w-[20%] lg:w-[15%]  h-[calc(100vh-6.1rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-700 mt-12">
                 <SidebarNavigation
-                    itemClass="w-full py-2 text-left font-medium"
-                    wrapperClass="flex flex-col items-start"
+                    itemClass="w-full my-2"
+                    wrapperClass="flex flex-col items-start py-2 px-auto mx-auto"
                 />
 
                 <button
                     onClick={handlePostClick}
-                    className="mt-4 bg-brand-orange text-white px-10 py-2 w-max rounded-full font-medium hover:bg-brand-orange-hover transition"
+                    className="mt-2 sm:mx-auto lg:mx-4 bg-brand-orange text-white px-3 py-2 w-max rounded-full font-medium hover:bg-brand-orange-hover transition"
                 >
+
                     Create Post
                 </button>
                 {/* <UploadDummyPosts /> */}

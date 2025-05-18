@@ -17,13 +17,11 @@ const MainFeed = ({ onPostClick }) => {
         }
         setActiveTab(value);
     };
-
     return (
-        <main className="w-full md:w-3/5 border-x border-gray-300 dark:border-gray-700 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-700 py-6 px-2 relative">
-
+        <main className="w-full md:flex flex-col md:w-[55%] lg:w-[63%]  h-[calc(100vh-5.1rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-700 mt-8 px-0 relative">
             {/* Tabs */}
-            <div className="sticky top-0 z-10 bg-light-bg dark:bg-dark-bg py-1">
-                <div className="flex justify-between">
+            <div className="sticky top-0 z-10 bg-light-bg dark:bg-dark-bg">
+                <div className="flex justify-between py-1 px-4">
                     <TabButton label="For You" value="foryou" activeTab={activeTab} setActiveTab={handleTabChange} />
                     <TabButton label="Following" value="following" activeTab={activeTab} setActiveTab={handleTabChange} />
                 </div>
@@ -46,8 +44,8 @@ const MainFeed = ({ onPostClick }) => {
                     </button>
                 </div>
             ) : (
-                <div className="fixed bottom-14 left-1/2 transform -translate-x-1/2 z-50 w-full flex justify-center px-4 md:hidden">
-                    <div className="flex items-center bg-orange-100 dark:bg-black text-orange-600 dark:text-orange-400 rounded-full px-4 py-2 shadow-md border border-orange-500 text-sm font-semibold gap-2 max-w-full whitespace-nowrap">
+                <div className="fixed bottom-11 left-1/2 transform -translate-x-1/2 z-50 w-full flex justify-center px-4 md:hidden">
+                    <div className="flex items-center bg-orange-100 dark:bg-black text-orange-600 dark:text-orange-400 rounded-full px-4 py-1.5 shadow-md border border-orange-500 text-sm font-semibold gap-2 max-w-full whitespace-nowrap">
                         <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
                         <span className="text-black dark:text-white">
                             Guest access ends in <span className="text-red-600 dark:text-white">🕒 {formattedTime.minutes}:{formattedTime.seconds.toString().padStart(2, "0")}</span>

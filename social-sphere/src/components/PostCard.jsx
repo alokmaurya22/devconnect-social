@@ -167,7 +167,7 @@ const PostCard = ({ post }) => {
 
 
     return (
-        <div className="bg-white dark:bg-dark-card rounded-lg shadow p-4">
+        <div className="bg-white dark:bg-dark-card rounded-lg shadow p-4 mx-4">
             {/* Top: User Info */}
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">

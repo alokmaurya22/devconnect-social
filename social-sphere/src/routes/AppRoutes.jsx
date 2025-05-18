@@ -32,7 +32,6 @@ const AppRoutes = () => {
             <Route path="/notifications" element={<ProtectedRoute element={<Notifications />} allowedRoutes={allowedRoutes} />} />
             <Route path="/bookmarks" element={<ProtectedRoute element={<Bookmarks />} allowedRoutes={allowedRoutes} />} />
             <Route path="/trending" element={<ProtectedRoute element={<RightSidebar />} allowedRoutes={allowedRoutes} />} />
-
         </Routes>
     );
 };

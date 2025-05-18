@@ -16,8 +16,9 @@ export const TabButton = ({ label, value, activeTab, setActiveTab }) => (
 // Sidebar Item
 export const SidebarItem = ({ icon, label }) => (
     <button className="flex items-center space-x-4 text-lg hover:text-brand-orange transition">
-        <span className="text-xl">{icon}</span>
-        <span>{label}</span>
+        <span className="text-base sm:text-sm md:text-base lg:text-lg "
+        >{icon}</span>
+        <span className="text-base font-medium sm:text-sm md:text-base lg:text-lg">{label}</span>
     </button>
 );
 

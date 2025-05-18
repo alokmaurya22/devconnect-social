@@ -208,20 +208,20 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="min-h-screen pt-20 pb-10 px-4 bg-light-bg dark:bg-dark-bg text-text-light dark:text-text-dark transition-colors duration-300">
-            {/* 🔁 Loader pehle hi return me conditionally dikhate hain */}
+        <div className="min-h-screen pt-8 pb-10 px-4 bg-light-bg dark:bg-dark-bg text-text-light dark:text-text-dark transition-colors duration-300">
+            {/*  Loader pehle hi return me conditionally dikhate hain */}
             {isLoading && (
                 <div className="fixed top-0 left-0 w-full h-full bg-black/40 z-50 flex flex-col items-center justify-center backdrop-blur-sm">
-                    {/* 🔄 Outer Spinner */}
+                    {/*  Outer Spinner */}
                     <div className="relative w-10 h-10">
                         <div className="absolute inset-0 border-[4px] border-orange-500 border-t-transparent rounded-full animate-spin" />
-                        {/* 🔁 Inner Spinner (Reverse spin) */}
+                        {/*  Inner Spinner (Reverse spin) */}
                         <div className="absolute inset-2 border-[3px] border-blue-500 border-t-transparent rounded-full animate-[spin_1s_linear_reverse_infinite]" />
                     </div>
                     <p className="mt-4 text-white text-lg font-semibold animate-pulse tracking-wide">Loading...</p>
                 </div>
             )}
-            <div className="max-w-6xl mx-auto py-6">
+            <div className="max-w-6xl mx-auto py-8">
                 <div className="text-center">
                     <h1 className="text-3xl font-bold text-brand-orange mb-4">Profile Section</h1>
                     <p className="text-sm text-gray-500 dark:text-gray-400">

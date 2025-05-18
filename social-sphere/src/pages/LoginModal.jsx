@@ -8,9 +8,10 @@ import { useGuestTimer } from "../context/GuestTimerContext";
 const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [message, setMessage] = useState("");
-    const { setShowTimer } = useGuestTimer();
+    const { setShowTimer, secondsLeft } = useGuestTimer();
     const navigate = useNavigate();
 
+    //console.log("Seconds Left:", secondsLeft);
     if (!isOpen) return null;
 
     const handleChange = (e) => {
@@ -50,13 +51,15 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
                 <div className="w-full bg-white dark:bg-dark-card rounded-2xl shadow-xl p-6 sm:p-10 relative">
 
                     {/* ❌ Close Button */}
-                    <button
-                        className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-brand-orange"
-                        onClick={handleClose}
-                        aria-label="Close"
-                    >
-                        &times;
-                    </button>
+                    {secondsLeft > 0 && (
+                        <button
+                            className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-brand-orange"
+                            onClick={handleClose}
+                            aria-label="Close"
+                        >
+                            &times;
+                        </button>
+                    )}
 
                     <h2 className="text-2xl sm:text-3xl font-bold text-brand-orange mb-6 text-center">
                         Login to continue..
