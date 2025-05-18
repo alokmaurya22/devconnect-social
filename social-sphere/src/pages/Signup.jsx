@@ -57,7 +57,7 @@ const SignUp = () => {
                 </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Full Name */}
+                    {/* Full Name  */}
                     <div>
                         <label className="block mb-1 text-sm font-medium">Full Name</label>
                         <input
