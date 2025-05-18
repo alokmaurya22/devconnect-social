@@ -33,7 +33,7 @@ const Feed = ({ activeTab }) => {
             time: "2h ago",
             content: "Learning React with Tailwind CSS is super fun! 🚀 #DevConnect",
             image: "",
-            type: "all"
+            type: "all "
         },
         {
             id: 5,
