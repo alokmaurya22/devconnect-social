@@ -225,7 +225,7 @@ const Navbar = () => {
                                 <Link
                                     to="/trending"
                                     onClick={() => setIsSidebarOpen(false)}
-                                    className="w-full py-2 px-4 text-brand-orange flex items-center gap-2 whitespace-nowrap text-base sm:text-sm md:text-base lg:text-lg"
+                                    className="w-full py-2 px-4 text-brand-orange flex items-center gap-2 whitespace-nowrap text-base sm:text-sm md:text-base font-semibold lg:text-lg"
                                 >
                                     <FaFire className="text-base sm:text-sm md:text-base lg:text-lg" />
                                     &nbsp;&nbsp;Trending
@@ -235,7 +235,7 @@ const Navbar = () => {
                                         handleLogout();
                                         setIsSidebarOpen(false);
                                     }}
-                                    className="w-full py-2 px-5 text-brand-orange flex items-center gap-2 whitespace-nowrap text-base sm:text-sm md:text-base lg:text-lg"
+                                    className="w-full py-2 px-5 text-brand-orange flex items-center gap-2 whitespace-nowrap text-base sm:text-sm md:text-base font-semibold lg:text-lg"
                                 >
                                     <FaSignOutAlt className="text-base sm:text-sm md:text-base lg:text-lg" /> &nbsp;&nbsp;Logout
                                 </button>
