@@ -1,20 +1,30 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
 import { Smile, Send, ArrowLeft } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
 import { fetchChatUsers } from "../utils/chatUtils/userFetch";
-
+import { db } from "../configuration/firebaseConfig";
 const Chats = () => {
-    const [selectedUser, setSelectedUser] = useState(null);
     const [messageText, setMessageText] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const [users, setUsers] = useState([]);
+    const [chatUsers, setChatUsers] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [messages, setMessages] = useState([]);
+    const { chatUserID } = useParams();
     const inputRef = useRef(null);
     const emojiRef = useRef(null);
+    const messageEndRef = useRef(null);
 
+    // Scroll to bottom on new messages
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (emojiRef.current && !emojiRef.current.contains(event.target)) {
+        messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
+    // Close emoji picker on outside click
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (emojiRef.current && !emojiRef.current.contains(e.target)) {
                 setShowEmojiPicker(false);
             }
         };
@@ -30,12 +40,42 @@ const Chats = () => {
         };
     }, [showEmojiPicker]);
 
+    // Load chat users + handle chatUserID
     useEffect(() => {
-        const userId = sessionStorage.getItem("userID");
-        if (userId) {
-            fetchChatUsers(userId).then(setUsers);
-        }
-    }, []);
+        const loadUsers = async () => {
+            const loggedUserId = sessionStorage.getItem("userID");
+            if (!loggedUserId) return;
+
+            let users = await fetchChatUsers(loggedUserId);
+
+            const exists = users.some(u => u.id === chatUserID);
+
+            if (!exists && chatUserID && chatUserID !== loggedUserId) {
+                try {
+                    const snap = await getDoc(doc(db, "users", chatUserID));
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        users = [
+                            {
+                                id: chatUserID,
+                                name: data.fullName || "Unnamed User",
+                                dp: data.dp || `https://api.dicebear.com/7.x/thumbs/svg?seed=${chatUserID}`,
+                            },
+                            ...users,
+                        ];
+                    }
+                } catch (err) {
+                    console.error("Error fetching user from chatUserID:", err);
+                }
+            }
+
+            setChatUsers(users);
+            const selected = users.find(u => u.id === chatUserID);
+            if (selected) setSelectedUser(selected);
+        };
+
+        loadUsers();
+    }, [chatUserID]);
 
     const handleEmojiClick = (emojiData) => {
         setMessageText((prev) => prev + emojiData.emoji);
@@ -49,7 +89,7 @@ const Chats = () => {
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isSent: true,
         };
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        setMessages((prev) => [...prev, newMessage]);
         setMessageText("");
     };
 
@@ -68,7 +108,7 @@ const Chats = () => {
                     <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Message</h2>
                 </div>
                 <div className="flex-1 overflow-y-auto p-2 space-y-2">
-                    {users.map((user) => (
+                    {chatUsers.map((user) => (
                         <div
                             key={user.id}
                             onClick={() => {
@@ -94,7 +134,7 @@ const Chats = () => {
                 </div>
             </div>
 
-            {/* Main Chat Section */}
+            {/* Chat Section */}
             {selectedUser && (
                 <div className="flex-1 flex flex-col mt-1">
                     {/* Header */}
@@ -102,11 +142,9 @@ const Chats = () => {
                         <button
                             className="md:hidden p-2 rounded-full hover:bg-muted transition-colors"
                             onClick={() => setSelectedUser(null)}
-                            aria-label="Back"
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </button>
-
                         <img
                             src={selectedUser.dp}
                             alt={selectedUser.name}
@@ -131,9 +169,10 @@ const Chats = () => {
                                 </div>
                             </div>
                         ))}
+                        <div ref={messageEndRef} />
                     </div>
 
-                    {/* Chat Input */}
+                    {/* Input */}
                     <div className="relative px-4 py-3 border-t dark:border-gray-800 bg-card">
                         {showEmojiPicker && (
                             <div
@@ -149,7 +188,7 @@ const Chats = () => {
                                     previewConfig={{ showPreview: false }}
                                     skinTonesDisabled
                                     lazyLoadEmojis
-                                    searchDisabled={true}
+                                    searchDisabled
                                     suggestedEmojisMode="recent"
                                     emojiVersion="5.0"
                                 />
@@ -160,7 +199,6 @@ const Chats = () => {
                             <button
                                 className="p-2 rounded-full hover:bg-muted transition-colors"
                                 onClick={() => setShowEmojiPicker((prev) => !prev)}
-                                aria-label="Emoji"
                             >
                                 <Smile className="w-5 h-5 text-brand-orange" />
                             </button>
@@ -176,7 +214,6 @@ const Chats = () => {
                             <button
                                 className="p-2 rounded-full bg-brand-orange text-white hover:bg-orange-600 transition-colors"
                                 onClick={handleSendMessage}
-                                aria-label="Send"
                             >
                                 <Send className="w-5 h-5" />
                             </button>

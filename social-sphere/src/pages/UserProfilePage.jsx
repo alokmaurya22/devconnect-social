@@ -104,7 +104,7 @@ const UserProfilePage = () => {
                                 )}
 
                                 <button
-                                    onClick={() => console.log("Message Clicked")}
+                                    onClick={() => navigate(`/chats/${searchedUserID}`)}
                                     className="bg-blue-500 dark:bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-700 transition-colors"
                                 >
                                     <FaComment className="text-xl" />
