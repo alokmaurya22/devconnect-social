@@ -5,12 +5,13 @@ import { Smile, Send, ArrowLeft } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
 import { fetchChatUsers } from "../utils/chatUtils/userFetch";
 import { db } from "../configuration/firebaseConfig";
-import { getChatId, sendMessage, listenToMessages } from "../utils/chatUtils/chatService";
+import { getChatId, sendMessage, listenToMessages, fetchMessagedUsers } from "../utils/chatUtils/chatService";
 
 const Chats = () => {
     const [messageText, setMessageText] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [chatUsers, setChatUsers] = useState([]);
+    const [messagedUsers, setMessagedUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -38,7 +39,7 @@ const Chats = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Load chat users
+    // Load chat users and messaged users
     useEffect(() => {
         const loadUsers = async () => {
             try {
@@ -48,27 +49,31 @@ const Chats = () => {
                     throw new Error("No user logged in");
                 }
 
-                let users = await fetchChatUsers(loggedUserId);
+                // Fetch both regular chat users and messaged users
+                const [users, messaged] = await Promise.all([
+                    fetchChatUsers(loggedUserId),
+                    fetchMessagedUsers(loggedUserId)
+                ]);
 
-                // If URL has chatUserID but it's not in contacts, fetch that user
-                if (chatUserID && chatUserID !== loggedUserId &&
-                    !users.some(u => u.id === chatUserID)) {
-                    const userDoc = await getDoc(doc(db, "users", chatUserID));
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        users = [{
-                            id: chatUserID,
-                            name: userData.fullName || "Unnamed User",
-                            dp: userData.dp || `https://api.dicebear.com/7.x/thumbs/svg?seed=${chatUserID}`,
-                        }, ...users];
+                // Combine and deduplicate users
+                const allUsers = [...users];
+                messaged.forEach(messagedUser => {
+                    if (!users.some(u => u.id === messagedUser.userId)) {
+                        allUsers.push({
+                            id: messagedUser.userId,
+                            name: messagedUser.name,
+                            dp: messagedUser.dp,
+                            lastMessaged: messagedUser.lastMessaged
+                        });
                     }
-                }
+                });
 
-                setChatUsers(users);
+                setChatUsers(allUsers);
+                setMessagedUsers(messaged);
 
                 // Select user from URL if valid
                 if (chatUserID) {
-                    const userToSelect = users.find(u => u.id === chatUserID);
+                    const userToSelect = allUsers.find(u => u.id === chatUserID);
                     if (userToSelect) {
                         setSelectedUser(userToSelect);
                     } else {
@@ -118,6 +123,10 @@ const Chats = () => {
             const loggedUserId = sessionStorage.getItem("userID");
             if (!loggedUserId) return;
 
+            // Get current user data
+            const currentUserDoc = await getDoc(doc(db, "users", loggedUserId));
+            const currentUserData = currentUserDoc.data();
+
             const chatId = getChatId(loggedUserId, selectedUser.id);
             const newMessage = {
                 text: messageText,
@@ -125,7 +134,18 @@ const Chats = () => {
                 receiverId: selectedUser.id,
             };
 
-            await sendMessage(chatId, newMessage);
+            await sendMessage(
+                chatId,
+                newMessage,
+                {
+                    name: currentUserData.fullName || "You",
+                    dp: currentUserData.dp || ""
+                },
+                {
+                    name: selectedUser.name,
+                    dp: selectedUser.dp
+                }
+            );
             setMessageText("");
         } catch (err) {
             console.error("Error sending message:", err);
@@ -149,6 +169,27 @@ const Chats = () => {
             hour: "2-digit",
             minute: "2-digit",
         });
+    };
+
+    const formatRelativeTime = (timestamp) => {
+        if (!timestamp?.toDate) return "";
+        const now = new Date();
+        const date = timestamp.toDate();
+        const diffInHours = (now - date) / (1000 * 60 * 60);
+
+        if (diffInHours < 24) {
+            return date.toLocaleTimeString("en-IN", {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        } else if (diffInHours < 48) {
+            return "Yesterday";
+        } else {
+            return date.toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short"
+            });
+        }
     };
 
     const loggedUserId = sessionStorage.getItem("userID");
@@ -176,32 +217,68 @@ const Chats = () => {
                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-brand-orange"></div>
                     </div>
                 ) : (
-                    <div className="flex-1 overflow-y-auto p-2 space-y-2">
-                        {chatUsers.map((user) => (
-                            <div
-                                key={user.id}
-                                onClick={() => {
-                                    setSelectedUser(user);
-                                    navigate(`/chats/${user.id}`);
-                                }}
-                                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${selectedUser?.id === user.id
-                                    ? "bg-brand-orange/10 border border-brand-orange"
-                                    : "hover:bg-muted border border-transparent"
-                                    }`}
-                            >
-                                <img
-                                    src={user.dp}
-                                    alt={user.name}
-                                    className="w-10 h-10 rounded-full object-cover"
-                                />
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-medium truncate">{user.name}</p>
-                                    <p className="text-sm text-muted-foreground truncate">
-                                        {user.lastMessage || "Start chatting..."}
-                                    </p>
-                                </div>
+                    <div className="flex-1 overflow-y-auto">
+                        {/* Messaged Users Section */}
+                        {messagedUsers.length > 0 && (
+                            <div className="p-2 space-y-1">
+                                <p className="text-xs text-muted-foreground px-3 py-1">Recent conversations</p>
+                                {messagedUsers.map(user => (
+                                    <div
+                                        key={user.userId}
+                                        onClick={() => {
+                                            setSelectedUser({
+                                                id: user.userId,
+                                                name: user.name,
+                                                dp: user.dp
+                                            });
+                                            navigate(`/chats/${user.userId}`);
+                                        }}
+                                        className={`flex items-center p-3 rounded-lg cursor-pointer ${selectedUser?.id === user.userId ? "bg-muted" : "hover:bg-muted/50"}`}
+                                    >
+                                        <img
+                                            src={user.dp}
+                                            alt={user.name}
+                                            className="w-10 h-10 rounded-full mr-3"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium truncate">{user.name}</p>
+                                            <p className="text-xs text-muted-foreground truncate">
+                                                {formatRelativeTime(user.lastMessaged)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        )}
+
+                        {/* All Contacts Section */}
+                        <div className="p-2 space-y-1">
+                            <p className="text-xs text-muted-foreground px-3 py-1">All contacts</p>
+                            {chatUsers
+                                .filter(user => !messagedUsers.some(m => m.userId === user.id))
+                                .map(user => (
+                                    <div
+                                        key={user.id}
+                                        onClick={() => {
+                                            setSelectedUser(user);
+                                            navigate(`/chats/${user.id}`);
+                                        }}
+                                        className={`flex items-center p-3 rounded-lg cursor-pointer ${selectedUser?.id === user.id ? "bg-muted" : "hover:bg-muted/50"}`}
+                                    >
+                                        <img
+                                            src={user.dp}
+                                            alt={user.name}
+                                            className="w-10 h-10 rounded-full mr-3"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium truncate">{user.name}</p>
+                                            <p className="text-xs text-muted-foreground truncate">
+                                                {user.lastMessaged ? formatRelativeTime(user.lastMessaged) : "Not contacted yet"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
                     </div>
                 )}
             </div>
@@ -225,9 +302,9 @@ const Chats = () => {
                             alt={selectedUser.name}
                             className="w-10 h-10 rounded-full object-cover"
                         />
-                        <div>
-                            <p className="font-semibold">{selectedUser.name}</p>
-                            <p className="text-xs text-muted-foreground">
+                        <div className="flex-1 min-w-0">
+                            <p className="font-semibold truncate">{selectedUser.name}</p>
+                            <p className="text-xs text-muted-foreground truncate">
                                 {messages.length > 0
                                     ? `Last active: ${formatDateTime(messages[messages.length - 1].createdAt)}`
                                     : "Online"}
@@ -252,16 +329,15 @@ const Chats = () => {
                                     >
                                         <div
                                             className={`max-w-[75%] rounded-xl px-4 py-2 ${isSent
-                                                ? "bg-brand-orange text-white"  // Sent messages (right, orange)
-                                                : "bg-blue-600 text-white"     // Received messages (left, blue)
+                                                ? "bg-brand-orange text-white"
+                                                : "bg-blue-600 text-white"
                                                 }`}
                                         >
                                             <p>{msg.text}</p>
                                             <p className={`text-xs mt-1 ${isSent
-                                                ? "text-orange-100"  // Sent message timestamp
-                                                : "text-blue-100"    // Received message timestamp
-                                                }`}
-                                            >
+                                                ? "text-orange-100"
+                                                : "text-blue-100"
+                                                }`}>
                                                 {formatDateTime(msg.createdAt)}
                                                 {isSent && (
                                                     <span className="ml-2">
@@ -309,7 +385,7 @@ const Chats = () => {
                                 value={messageText}
                                 onChange={(e) => setMessageText(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                className="flex-1 rounded-xl px-4 py-2 bg-white dark:bg-black border border-input focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent dark:focus:border-transparent text-black dark:text-white"
+                                className="flex-1 rounded-xl px-4 py-2 bg-background border border-input focus:outline-none focus:ring-2 focus:ring-brand-orange"
                                 autoFocus
                             />
                             <button
