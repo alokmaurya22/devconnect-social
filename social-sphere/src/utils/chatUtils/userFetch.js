@@ -1,79 +1,53 @@
-// src/utils/chatHelpers.js
 import { db } from "../../configuration/firebaseConfig";
-import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 
-/**
- * Get all users the current user has interacted with (followers + following + messaged users)
- * @param {string} userId - The current user's Firestore UID
- * @returns {Promise<Array>} - List of user objects: { id, name, dp, lastMessaged? }
- */
 export const fetchChatUsers = async (userId) => {
+    if (!userId) return [];
+
     try {
-        // 1. First get basic user data
-        const userDoc = await getDoc(doc(db, "users", userId));
-        if (!userDoc.exists()) return [];
+        const userSnap = await getDoc(doc(db, "users", userId));
+        if (!userSnap.exists()) return [];
 
-        const { followers = [], followings = [] } = userDoc.data();
-        const uniqueUserIds = new Set([...followers, ...followings]);
+        //This will fetch all users who are following or followed by the user
+        //const { followers = [], followings = [] } = userSnap.data();
+        const { followers = [], followings = [] } = "";
+        const uniqueIds = new Set([...followers, ...followings]);
 
-        // 2. Get users from messagedUsers subcollection
-        const messagedUsersRef = collection(db, "users", userId, "messagedUsers");
-        const messagedUsersSnap = await getDocs(messagedUsersRef);
+        const messagedSnap = await getDocs(collection(db, "users", userId, "messagedUsers"));
+        messagedSnap.forEach((doc) => uniqueIds.add(doc.id));
 
-        messagedUsersSnap.forEach(doc => {
-            uniqueUserIds.add(doc.id); // Add all messaged users to the set
-        });
-
-        // 3. Fetch details for all unique users in parallel
         const users = await Promise.all(
-            Array.from(uniqueUserIds).map(async (uid) => {
+            Array.from(uniqueIds).map(async (uid) => {
+                if (uid === userId) return null;
                 try {
-                    // Skip if it's the current user
-                    if (uid === userId) return null;
+                    const uSnap = await getDoc(doc(db, "users", uid));
+                    if (!uSnap.exists()) return null;
 
-                    const userSnap = await getDoc(doc(db, "users", uid));
-                    if (!userSnap.exists()) return null;
-
-                    const data = userSnap.data();
-
-                    // Check if user exists in messagedUsers for lastMessaged timestamp
-                    let lastMessaged = null;
-                    const messagedUserDoc = messagedUsersSnap.docs.find(d => d.id === uid);
-                    if (messagedUserDoc) {
-                        lastMessaged = messagedUserDoc.data().lastMessaged;
-                    }
+                    const data = uSnap.data();
+                    const msgDoc = messagedSnap.docs.find((d) => d.id === uid);
 
                     return {
                         id: uid,
-                        name: data.fullName || "Unnamed User",
+                        name: data.fullName || "Unnamed",
                         dp: data.dp || `https://api.dicebear.com/7.x/thumbs/svg?seed=${uid}`,
-                        lastMessaged,
-                        // Add any other relevant fields
+                        lastMessaged: msgDoc?.data()?.lastMessaged,
+                        isFollowing: followings.includes(uid),
                     };
-                } catch (error) {
-                    console.error(`Error fetching user ${uid}:`, error);
+                } catch (err) {
+                    console.error(`Error fetching user ${uid}:`, err);
                     return null;
                 }
             })
         );
 
-        // 4. Sort by lastMessaged (newest first) then by name
-        return users.filter(Boolean).sort((a, b) => {
-            // Users with lastMessaged come first
-            if (a.lastMessaged && !b.lastMessaged) return -1;
-            if (!a.lastMessaged && b.lastMessaged) return 1;
-
-            // Both have lastMessaged - sort by timestamp
-            if (a.lastMessaged && b.lastMessaged) {
-                return b.lastMessaged.toMillis() - a.lastMessaged.toMillis();
-            }
-
-            // Fallback to alphabetical
-            return a.name.localeCompare(b.name);
-        });
-
-    } catch (error) {
-        console.error("Error in fetchChatUsers:", error);
+        return users
+            .filter(Boolean)
+            .sort((a, b) => {
+                const getTime = (t) => (t?.toMillis ? t.toMillis() : 0);
+                return getTime(b.lastMessaged) - getTime(a.lastMessaged);
+            });
+    } catch (err) {
+        console.error("fetchChatUsers error:", err);
         return [];
     }
 };

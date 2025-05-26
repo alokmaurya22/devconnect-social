@@ -1,151 +1,67 @@
+// src/utils/chatService.js
 import { db } from "../../configuration/firebaseConfig";
-import {
-    collection,
-    addDoc,
-    query,
-    orderBy,
-    onSnapshot,
-    serverTimestamp,
-    setDoc,
-    doc,
-    getDocs
-} from "firebase/firestore";
+import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, setDoc, doc, } from "firebase/firestore";
 
-/**
- * Generates a consistent chat ID between two users
- * @param {string} user1 - First user ID
- * @param {string} user2 - Second user ID
- * @returns {string} Combined chat ID
- */
-export const getChatId = (user1, user2) => {
-    return [user1, user2].sort().join("_");
-};
+// Function to generate a unique chat ID alphabetically sorted and joined with (_)
+export const getChatId = (user1, user2) => [user1, user2].sort().join("_");
 
-/**
- * Adds a user to messagedUsers subcollection
- * @param {string} userId - Current user ID
- * @param {string} otherUserId - Other user ID to add
- * @param {object} otherUserData - Other user's data (name, dp)
- */
-export const addToMessagedUsers = async (userId, otherUserId, otherUserData) => {
+// Function to add a user to the messagedUsers subcollection, for recent chats show
+export const addToMessagedUsers = async (userId, otherUserId, { name, dp }) => {
+    if (!userId || !otherUserId) return;
     try {
-        const userRef = doc(db, "users", userId, "messagedUsers", otherUserId);
-        await setDoc(userRef, {
-            userId: otherUserId,
-            name: otherUserData.name || "Unknown User",
-            dp: otherUserData.dp || `https://api.dicebear.com/7.x/thumbs/svg?seed=${otherUserId}`,
-            lastMessaged: serverTimestamp()
-        }, { merge: true });
-    } catch (error) {
-        console.error("Error updating messagedUsers:", error);
-        throw error;
-    }
-};
-
-/**
- * Fetches all users the current user has messaged
- * @param {string} userId - Current user ID
- * @returns {Promise<Array>} List of messaged users
- */
-export const fetchMessagedUsers = async (userId) => {
-    try {
-        const q = query(
-            collection(db, "users", userId, "messagedUsers"),
-            orderBy("lastMessaged", "desc")
+        await setDoc(
+            doc(db, "users", userId, "messagedUsers", otherUserId),
+            {
+                name,
+                dp,
+                userId: otherUserId,
+                lastMessaged: serverTimestamp(),
+            },
+            { merge: true }
         );
-
-        const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => ({
-            userId: doc.id,
-            ...doc.data()
-        }));
-    } catch (error) {
-        console.error("Error fetching messaged users:", error);
-        return [];
+    } catch (err) {
+        console.error("Error updating messagedUsers:", err);
+        throw err;
     }
 };
 
-/**
- * Sends a message and updates messagedUsers for both parties
- * @param {string} chatId - Chat ID between users
- * @param {object} message - Message content {text, senderId, receiverId}
- * @param {object} senderData - Sender's profile data {name, dp}
- * @param {object} receiverData - Receiver's profile data {name, dp}
- */
+
+// Function to send a message into a chat
 export const sendMessage = async (chatId, message, senderData, receiverData) => {
     try {
-        // 1. Send the actual message
         const messagesRef = collection(db, "chats", chatId, "messages");
-        const messageDoc = await addDoc(messagesRef, {
+        await addDoc(messagesRef, {
             ...message,
             createdAt: serverTimestamp(),
-            status: 'sent' // Can be 'sent', 'delivered', or 'read'
+            status: "sent",
         });
 
-        // 2. Update sender's messagedUsers
-        await addToMessagedUsers(
-            message.senderId,
-            message.receiverId,
-            receiverData
-        );
-
-        // 3. Update receiver's messagedUsers
-        await addToMessagedUsers(
-            message.receiverId,
-            message.senderId,
-            senderData
-        );
-
-        return messageDoc.id;
-    } catch (error) {
-        console.error("Error sending message:", error);
-        throw error;
+        await Promise.all([
+            addToMessagedUsers(message.senderId, message.receiverId, receiverData),
+            addToMessagedUsers(message.receiverId, message.senderId, senderData),
+        ]);
+    } catch (err) {
+        console.error("Error sending message:", err);
+        throw err;
     }
 };
 
-/**
- * Sets up real-time listener for messages in a chat
- * @param {string} chatId - Chat ID between users
- * @param {function} callback - Function to call with new messages
- * @returns {function} Unsubscribe function
- */
+// Function to update to messages in a chat. jab bhi koi message add/update/delete hota hai specific chat ke andar, to ye real-time mein update krta hai
 export const listenToMessages = (chatId, callback) => {
-    try {
-        const messagesRef = collection(db, "chats", chatId, "messages");
-        const q = query(
-            messagesRef,
-            orderBy("createdAt", "asc")
-        );
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const messages = snapshot.docs.map(doc => ({
+    if (!chatId) return () => { };
+    const q = query(collection(db, "chats", chatId, "messages"), orderBy("createdAt", "asc"));
+    return onSnapshot(
+        q,
+        (snapshot) => {
+            const messages = snapshot.docs.map((doc) => ({
                 id: doc.id,
-                ...doc.data()
+                ...doc.data(),
+                timestamp: doc.data().createdAt?.toMillis() || Date.now(),
             }));
             callback(messages);
-        }, (error) => {
-            console.error("Message listener error:", error);
-        });
-
-        return unsubscribe;
-    } catch (error) {
-        console.error("Error setting up message listener:", error);
-        return () => { }; // Return empty function if setup fails
-    }
-};
-
-/**
- * Updates message status (e.g., 'read')
- * @param {string} chatId - Chat ID
- * @param {string} messageId - Message ID
- * @param {string} status - New status ('delivered' or 'read')
- */
-export const updateMessageStatus = async (chatId, messageId, status) => {
-    try {
-        const messageRef = doc(db, "chats", chatId, "messages", messageId);
-        await setDoc(messageRef, { status }, { merge: true });
-    } catch (error) {
-        console.error("Error updating message status:", error);
-        throw error;
-    }
+        },
+        (err) => {
+            console.error("Message listener error:", err);
+        }
+    );
 };
