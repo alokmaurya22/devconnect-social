@@ -135,30 +135,6 @@ export const getFollowings = async (userID) => {
     }
 };
 
-/*
-// How can we use these functions
-const userID = "someUserID";
-
-getFollowers(userID)
-  .then(followers => {
-    console.log("Followers:", followers);
-    // followers will be an array of objects like:
-    // [{ userId: "user1", followedAt: Timestamp }, { userId: "user2", followedAt: Timestamp }, ...]
-  })
-  .catch(error => {
-    console.error("Failed to get followers:", error);
-  });
-
-getFollowings(userID)
-  .then(followings => {
-    console.log("Following:", followings);
-    // followings will be an array of objects like:
-    // [{ userId: "userA", followedAt: Timestamp }, { userId: "userB", followedAt: Timestamp }, ...]
-  })
-  .catch(error => {
-    console.error("Failed to get followings:", error);
-  });
-*/
 
 //Retrieves the follower and following counts for a user
 /**

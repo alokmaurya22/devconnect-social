@@ -12,6 +12,8 @@ import Explore from "../pages/Explore";
 import Notifications from "../pages/Notifications";
 import Bookmarks from "../pages/Bookmarks";
 import RightSidebar from "../components/homePageComponents/RightSidebar";
+import FollowersFollowingPage from "../pages/getConnections";
+
 const AppRoutes = () => {
     const allowedRoutes = ["/login", "/signup", "/"]; // 👈 guest can access
 
@@ -33,6 +35,7 @@ const AppRoutes = () => {
             <Route path="/notifications" element={<ProtectedRoute element={<Notifications />} allowedRoutes={allowedRoutes} />} />
             <Route path="/bookmarks" element={<ProtectedRoute element={<Bookmarks />} allowedRoutes={allowedRoutes} />} />
             <Route path="/trending" element={<ProtectedRoute element={<RightSidebar />} allowedRoutes={allowedRoutes} />} />
+            <Route path="/connections/:userId" element={<ProtectedRoute element={<FollowersFollowingPage />} allowedRoutes={allowedRoutes} />} />
         </Routes>
     );
 };

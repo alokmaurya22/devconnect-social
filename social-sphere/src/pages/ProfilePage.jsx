@@ -4,6 +4,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../configuration/firebaseConfig";
 import compressImage from '../utils/imageCompressor';
 import { getFollowCounts } from "../utils/followUtils";
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +30,20 @@ const ProfilePage = () => {
         followerCount: 0,
         followingCount: 0
     });
+
+    // const userid = sessionStorage.getItem("userID");
+    // console.log("User ID:", userid);
+
+    const navigate = useNavigate();
+    // handle connections followers and following show
+    const handleConnectionsClick = (type) => {
+        const uid = sessionStorage.getItem("userID");
+        if (uid) {
+            navigate(`/connections/${uid}?type=${type}`);
+        } else {
+            console.warn("User ID not found in session storage");
+        }
+    };
 
     // fetch user data
     useEffect(() => {
@@ -283,11 +298,11 @@ const ProfilePage = () => {
                                 “A profile picture speaks before you do.”
                             </p>
                             <div className="mt-4 flex gap-6 text-sm text-gray-600 dark:text-gray-300 font-medium justify-center">
-                                <div className="text-center">
+                                <div className="text-center cursor-pointer" onClick={() => handleConnectionsClick('followers')}>
                                     <span className="block text-lg font-bold">{followCounts.followerCount}</span>
                                     Followers
                                 </div>
-                                <div className="text-center">
+                                <div className="text-center cursor-pointer" onClick={() => handleConnectionsClick('followings')}>
                                     <span className="block text-lg font-bold">{followCounts.followingCount}</span>
                                     Followings
                                 </div>
