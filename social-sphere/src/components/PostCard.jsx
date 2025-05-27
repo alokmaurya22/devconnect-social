@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaHeart, FaRegComment, FaShare, FaBookmark, FaUserCircle, } from "react-icons/fa";
 import { useGuestTimer } from "../context/GuestTimerContext";
 import { toggleLike, toggleSave, logShare, addComment, fetchComments, checkPostActionStatus, getActionCount, getUsersByAction, } from "../utils/postActions";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../configuration/firebaseConfig";
-import { followUser } from "../utils/followUtils";
+import { followUser, checkIfFollowing } from "../utils/followUtils";
 import { useNavigate } from "react-router-dom";
 
 const PostCard = ({ post }) => {
@@ -33,7 +31,6 @@ const PostCard = ({ post }) => {
         }
     }, [actionStatus.liked])
 
-
     const [saved, setSaved] = useState(actionStatus.saved || false);
     useEffect(() => {
         if (actionStatus.saved) {
@@ -44,6 +41,7 @@ const PostCard = ({ post }) => {
     const currentUserId = sessionStorage.getItem("userID");
     const navigate = useNavigate();
 
+    // Fetch action counts and action status
     useEffect(() => {
         const init = async () => {
             const [counts, status] = await Promise.all([
@@ -56,21 +54,24 @@ const PostCard = ({ post }) => {
         init();
     }, [post.id, currentUserId]);
 
+    // Check if the current user is following the post's user
     useEffect(() => {
         const checkFollowingStatus = async () => {
             if (!isAuthenticated || !currentUserId || currentUserId === post.userId) return;
-            const userSnap = await getDoc(doc(db, "users", currentUserId));
-            const isFollowing = (userSnap.data().followings || []).includes(post.userId);
+
+            const isFollowing = await checkIfFollowing(currentUserId, post.userId);
             setShowFollowButton(!isFollowing);
         };
         checkFollowingStatus();
-    }, [isAuthenticated, post.userId]);
+    }, [isAuthenticated, currentUserId, post.userId]);
 
+    //Follow the post's user
     const handleFollowUser = async () => {
         const success = await followUser(currentUserId, post.userId);
         if (success) setShowFollowButton(false);
     };
 
+    // Handle like and save actions
     const handleLikeClick = () => {
         if (!isAuthenticated) {
             openLoginModal();

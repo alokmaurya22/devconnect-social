@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../configuration/firebaseConfig";
 import { FaComment } from "react-icons/fa";
-import { followUser, unfollowUser, checkIfFollowing } from "../utils/followUtils";
+import { followUser, unfollowUser, checkIfFollowing, getFollowCounts } from "../utils/followUtils";
 
 const UserProfilePage = () => {
     const { userId: searchedUserID } = useParams();
@@ -24,10 +24,15 @@ const UserProfilePage = () => {
         if (userSnap.exists()) {
             const data = userSnap.data();
             setUserData(data);
-
-            setFollowersCount(data.followers?.length || 0);
-            setFollowingCount(data.followings?.length || 0);
         }
+    };
+
+    const fetchFollowCounts = async () => {
+        if (!searchedUserID) return;
+
+        const { followerCount, followingCount } = await getFollowCounts(searchedUserID);
+        setFollowersCount(followerCount);
+        setFollowingCount(followingCount);
     };
 
     const updateFollowStatus = async () => {
@@ -38,6 +43,7 @@ const UserProfilePage = () => {
     };
     useEffect(() => {
         fetchUserData();
+        fetchFollowCounts();
         updateFollowStatus();
     }, [searchedUserID]);
 

@@ -3,6 +3,8 @@ import { doc, getDoc, updateDoc, query, where, getDocs, collection, } from "fire
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../configuration/firebaseConfig";
 import compressImage from '../utils/imageCompressor';
+import { getFollowCounts } from "../utils/followUtils";
+
 const ProfilePage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -23,6 +25,10 @@ const ProfilePage = () => {
     // username availability states
     const [usernameStatus, setUsernameStatus] = useState("");
     const [isUsernameAvailable, setIsUsernameAvailable] = useState(null);
+    const [followCounts, setFollowCounts] = useState({
+        followerCount: 0,
+        followingCount: 0
+    });
 
     // fetch user data
     useEffect(() => {
@@ -45,6 +51,20 @@ const ProfilePage = () => {
 
         fetchUserData();
     }, []);
+
+    //setup for important data
+    const uid = sessionStorage.getItem("userID");
+    const currentUsername = currentUserData.username;
+    getFollowCounts(uid)
+        .then(counts => {
+            setFollowCounts({
+                followerCount: counts.followerCount,
+                followingCount: counts.followingCount
+            });
+        })
+        .catch(error => {
+            console.error("Failed to get follow counts:", error);
+        });
 
     // fetch posts
     useEffect(() => {
@@ -70,11 +90,6 @@ const ProfilePage = () => {
 
         fetchPosts();
     }, []);
-
-    //setup for important data
-    const currentUsername = currentUserData.username;
-    const userFollowers = currentUserData?.followers?.length || 0;
-    const userFollowings = currentUserData?.followings?.length || 0;
 
     // image change
     const handleImageChange = async (e) => {
@@ -269,11 +284,11 @@ const ProfilePage = () => {
                             </p>
                             <div className="mt-4 flex gap-6 text-sm text-gray-600 dark:text-gray-300 font-medium justify-center">
                                 <div className="text-center">
-                                    <span className="block text-lg font-bold">{userFollowers}</span>
+                                    <span className="block text-lg font-bold">{followCounts.followerCount}</span>
                                     Followers
                                 </div>
                                 <div className="text-center">
-                                    <span className="block text-lg font-bold">{userFollowings}</span>
+                                    <span className="block text-lg font-bold">{followCounts.followingCount}</span>
                                     Followings
                                 </div>
                             </div>
