@@ -4,7 +4,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../configuration/firebaseConfig";
 import compressImage from '../utils/imageCompressor';
 import { getFollowCounts } from "../utils/followUtils";
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -34,8 +34,24 @@ const ProfilePage = () => {
     // const userid = sessionStorage.getItem("userID");
     // console.log("User ID:", userid);
 
+
+    const location = useLocation();
     const navigate = useNavigate();
-    // handle connections followers and following show
+
+    const handleConnectionsClick = (type) => {
+        const uid = sessionStorage.getItem("userID");
+        if (uid) {
+            const basePath = location.pathname; // e.g., "/profile"
+            const query = `?showModal=true&type=${type}&userId=${uid}`;
+            navigate(`${basePath}${query}`);
+        } else {
+            console.warn("User ID not found in session storage");
+        }
+    };
+
+    /*
+    // purana code following followers ke liye
+    const navigate = useNavigate();
     const handleConnectionsClick = (type) => {
         const uid = sessionStorage.getItem("userID");
         if (uid) {
@@ -44,6 +60,7 @@ const ProfilePage = () => {
             console.warn("User ID not found in session storage");
         }
     };
+    */
 
     // fetch user data
     useEffect(() => {

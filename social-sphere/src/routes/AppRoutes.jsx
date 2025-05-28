@@ -24,6 +24,7 @@ const AppRoutes = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/user/:userId" element={<UserProfilePage />} />
+            <Route path="/connections/:userId" element={<div />} />
 
             {/* Protected routes access after login */}
             <Route path="/home" element={<ProtectedRoute element={<Home />} allowedRoutes={allowedRoutes} />} />
@@ -35,7 +36,6 @@ const AppRoutes = () => {
             <Route path="/notifications" element={<ProtectedRoute element={<Notifications />} allowedRoutes={allowedRoutes} />} />
             <Route path="/bookmarks" element={<ProtectedRoute element={<Bookmarks />} allowedRoutes={allowedRoutes} />} />
             <Route path="/trending" element={<ProtectedRoute element={<RightSidebar />} allowedRoutes={allowedRoutes} />} />
-            <Route path="/connections/:userId" element={<ProtectedRoute element={<FollowersFollowingPage />} allowedRoutes={allowedRoutes} />} />
         </Routes>
     );
 };

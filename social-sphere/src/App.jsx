@@ -2,6 +2,8 @@ import React from "react";
 import Navbar from "./components/Navbar";
 import AppRoutes from "./routes/AppRoutes";
 import Footer from "./components/Footer";
+import GlobalModalHandler from "./components/modal/GlobalModalHandler";
+
 
 const App = () => {
   return (
@@ -14,6 +16,7 @@ const App = () => {
 
       {/* Scrollable Main Content */}
       <div className="flex-1 mt-2 mb-9 overflow-y-auto ">
+        <GlobalModalHandler />  {/* Yeh modal ko route sunne dega */}
         <AppRoutes />
       </div>
 
