@@ -12,7 +12,6 @@ import Explore from "../pages/Explore";
 import Notifications from "../pages/Notifications";
 import Bookmarks from "../pages/Bookmarks";
 import RightSidebar from "../components/homePageComponents/RightSidebar";
-import FollowersFollowingPage from "../pages/getConnections";
 
 const AppRoutes = () => {
     const allowedRoutes = ["/login", "/signup", "/"]; // 👈 guest can access
@@ -23,14 +22,13 @@ const AppRoutes = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/user/:userId" element={<UserProfilePage />} />
-            <Route path="/connections/:userId" element={<div />} />
 
             {/* Protected routes access after login */}
             <Route path="/home" element={<ProtectedRoute element={<Home />} allowedRoutes={allowedRoutes} />} />
             <Route path="/createPost" element={<ProtectedRoute element={<CreatePost />} allowedRoutes={allowedRoutes} />} />
             <Route path="/chats" element={<ProtectedRoute element={<Chats />} allowedRoutes={allowedRoutes} />} />
             <Route path="/chats/:chatUserID" element={<ProtectedRoute element={<Chats />} allowedRoutes={allowedRoutes} />} />
+            <Route path="/user/:userId" element={<ProtectedRoute element={<UserProfilePage />} allowedRoutes={allowedRoutes} />} />
             <Route path="/profile" element={<ProtectedRoute element={<ProfilePage />} allowedRoutes={allowedRoutes} />} />
             <Route path="/explore" element={<ProtectedRoute element={<Explore />} allowedRoutes={allowedRoutes} />} />
             <Route path="/notifications" element={<ProtectedRoute element={<Notifications />} allowedRoutes={allowedRoutes} />} />
