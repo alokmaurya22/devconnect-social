@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../configuration/firebaseConfig";
 import { FaComment } from "react-icons/fa";
@@ -14,7 +14,17 @@ const UserProfilePage = () => {
     const loggedUserID = sessionStorage.getItem("userID");
 
     const navigate = useNavigate();
+    const location = useLocation();
 
+    const handleConnectionsClick = (type) => {
+        if (searchedUserID) {
+            const basePath = location.pathname;
+            const query = `?showModal=true&type=${type}&userId=${searchedUserID}`;
+            navigate(`${basePath}${query}`);
+        } else {
+            console.warn("User ID not found in session storage");
+        }
+    };
     const fetchUserData = async () => {
         if (!searchedUserID) return;
 
@@ -63,6 +73,7 @@ const UserProfilePage = () => {
         }
     };
 
+
     if (!userData) return <div>Loading...</div>;
 
     return (
@@ -74,20 +85,20 @@ const UserProfilePage = () => {
                     <div className="flex flex-col items-center justify-center w-full md:w-1/3 space-y-6">
                         <div className="relative group w-40 h-40 rounded-full overflow-hidden border-4 border-brand-orange shadow-lg group-hover:scale-105 transition-all duration-300">
                             <img
-                                src={userData.dp || "https://via.placeholder.com/150"}
+                                src={userData.dp || `https://api.dicebear.com/7.x/thumbs/svg?seed=${userData.uid}`}
                                 alt="Profile"
                                 className="w-full h-full object-cover"
                             />
                         </div>
 
                         <div className="flex gap-6 text-sm text-gray-600 dark:text-gray-300 font-medium">
-                            <div className="text-center">
-                                <span className="block text-lg font-bold">{followersCount}</span>
+                            <div className="text-center cursor-pointer" onClick={() => handleConnectionsClick('followers')}>
+                                <span className="block text-lg font-bold text-brand-orange">{followersCount}</span>
                                 Followers
                             </div>
-                            <div className="text-center">
-                                <span className="block text-lg font-bold">{followingCount}</span>
-                                Following
+                            <div className="text-center cursor-pointer" onClick={() => handleConnectionsClick('followings')}>
+                                <span className="block text-lg font-bold text-brand-orange">{followingCount}</span>
+                                Followings
                             </div>
                         </div>
 
@@ -148,7 +159,7 @@ const UserProfilePage = () => {
                             <strong>Interests:</strong> {userData.interests}
                         </p>
 
-                        {/* 🏠 Go to Home Button */}
+                        {/* Go to Home Button */}
                         <div className="pt-4 flex justify-center md:justify-start">
                             <button
                                 onClick={() => navigate("/home")}

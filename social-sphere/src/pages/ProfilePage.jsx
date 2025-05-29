@@ -50,7 +50,7 @@ const ProfilePage = () => {
     };
 
     /*
-    // purana code following followers ke liye
+    // purana code following followers ke liye bina model ka getConnections file ke liye
     const navigate = useNavigate();
     const handleConnectionsClick = (type) => {
         const uid = sessionStorage.getItem("userID");
@@ -316,11 +316,11 @@ const ProfilePage = () => {
                             </p>
                             <div className="mt-4 flex gap-6 text-sm text-gray-600 dark:text-gray-300 font-medium justify-center">
                                 <div className="text-center cursor-pointer" onClick={() => handleConnectionsClick('followers')}>
-                                    <span className="block text-lg font-bold">{followCounts.followerCount}</span>
+                                    <span className="block text-lg font-bold text-brand-orange">{followCounts.followerCount}</span>
                                     Followers
                                 </div>
                                 <div className="text-center cursor-pointer" onClick={() => handleConnectionsClick('followings')}>
-                                    <span className="block text-lg font-bold">{followCounts.followingCount}</span>
+                                    <span className="block text-lg font-bold text-brand-orange">{followCounts.followingCount}</span>
                                     Followings
                                 </div>
                             </div>
