@@ -65,6 +65,11 @@ const PostCard = ({ post }) => {
         checkFollowingStatus();
     }, [isAuthenticated, currentUserId, post.userId]);
 
+
+    const handleUserProfileClick = (id) => {
+        navigate(`/user/${id}`);
+    };
+
     //Follow the post's user
     const handleFollowUser = async () => {
         const success = await followUser(currentUserId, post.userId);
@@ -181,7 +186,7 @@ const PostCard = ({ post }) => {
                     ) : (
                         <FaUserCircle className="text-2xl text-gray-500 dark:text-gray-300" />
                     )}
-                    <h3 className="font-semibold text-brand-orange">
+                    <h3 className="font-semibold text-brand-orange cursor-pointer" onClick={() => handleUserProfileClick(post.userId)}>
                         {post.fullName} {/*post.userId*/}
                         <span className="block text-blue-900 dark:text-blue-400 text-xs mt-0">
                             @{post.username}{/*post.id*/}
