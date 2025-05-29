@@ -44,10 +44,23 @@ const Home = () => {
         <>
             {/* ======= NOTICE BAR ======= */}
             {showNotice && (
-                <div className="fixed top-[52px] left-0 w-full z-40 bg-yellow-400 text-black text-center py-1.5 text-sm font-semibold shadow-md transition-opacity duration-300">
-                    <span className="font-semibold text-xs sm:text-base">
-                        Some features are under development. Stay tuned for updates!
-                    </span>
+                <div>
+                    {/* Shown on small screens only */}
+                    <div className="fixed top-[52px] left-0 w-full z-40 bg-white text-black dark:bg-black dark:text-white text-center py-1.5 text-sm font-semibold block md:hidden">
+                        <span className="font-semibold text-xs sm:text-base">
+                            Social-Sphere is in active development. Some features may be unstable.
+                            <a href="https://forms.gle/pmYdvckr1QGJYGMo9" target="_blank" rel="noopener noreferrer" className="hover:underline cursor-pointer text-blue-600 dark:text-blue-400"> We’d love your feedback!</a>
+                        </span>
+                    </div>
+
+                    {/* Shown on medium and larger screens only */}
+                    <div className="fixed top-[52px] left-0 w-full z-40 bg-white text-black dark:bg-black dark:text-white text-center py-1.5 text-xs font-medium hidden md:block">
+                        <span className="font-semibold text-xs">
+                            Social-Sphere is currently under active development. Some features may not work as expected or may feel buggy. We appreciate your patience and
+                            <a href="https://forms.gle/pmYdvckr1QGJYGMo9" target="_blank" rel="noopener noreferrer" className="hover:underline cursor-pointer text-blue-600 dark:text-blue-400"> would love to hear your feedback!</a>
+                        </span>
+                    </div>
+
                 </div>
             )}
 
@@ -57,7 +70,7 @@ const Home = () => {
             )}
 
             {/* ====================== MOBILE VIEW ====================== */}
-            <div className={`block md:hidden ${showNotice ? "mt-[65px]" : ""}`}>
+            <div className={`block md:hidden ${showNotice ? "mt-[85px]" : ""}`}>
                 <MainFeed onPostClick={handlePostClick} />
             </div>
 
