@@ -309,16 +309,35 @@ const PostCard = ({ post }) => {
     );
 };
 
-const timeAgo = (date) => {
+const timeAgo = (inputDate) => {
     const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
-    if (seconds < 60) return `${seconds}s ago`;
+    const date = new Date(inputDate); // In case input is not already a Date object
+    const diffMs = now - date;
+
+    const seconds = Math.floor(diffMs / 1000);
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
     const days = Math.floor(hours / 24);
-    return `${days}d ago`;
+    const weeks = Math.floor(days / 7);
+    const months = Math.floor(days / 30);
+    const years = Math.floor(days / 365);
+
+    if (minutes < 2) {
+        return "Just now";
+    } else if (minutes < 60) {
+        return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else if (hours < 24) {
+        return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else if (days < 7) {
+        return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (days < 30) {
+        return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+    } else if (days < 365) {
+        return `${months} month${months > 1 ? "s" : ""} ago`;
+    } else {
+        return `${years} year${years > 1 ? "s" : ""} ago`;
+    }
 };
+
 
 export default PostCard;
