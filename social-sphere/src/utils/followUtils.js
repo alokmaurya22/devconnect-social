@@ -161,3 +161,23 @@ export const getFollowCounts = async (userID) => {
         return { followerCount: 0, followingCount: 0 };
     }
 };
+
+/**
+ * Checks if currentUserId is a follower of postUserId.
+ * @param {string} postUserId - The ID of the user who created the post.
+ * @param {string} currentUserId - The ID of the currently logged-in user.
+ * @returns {Promise<boolean>} - True if currentUserId is a follower of postUserId, else false.
+ */
+export const checkIfUserIsFollower = async (postUserId, currentUserId) => {
+    try {
+        if (!postUserId || !currentUserId || postUserId === currentUserId) return false;
+
+        const followerDocRef = doc(db, `users/${postUserId}/followers`, currentUserId);
+        const followerSnap = await getDoc(followerDocRef);
+
+        return followerSnap.exists();
+    } catch (error) {
+        console.error("Error checking follower status:", error);
+        return false;
+    }
+};

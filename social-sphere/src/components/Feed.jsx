@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import PostCard from "./PostCard";
 import { db } from "../configuration/firebaseConfig";
 import { collection, getDocs, limit, orderBy, query, startAfter, getDoc, doc } from "firebase/firestore";
+import { checkIfUserIsFollower } from "../utils/followUtils";
 
-// Simple loader component jab data load ho raha ho
+// Loader component jab data load ho raha hota hai
 const Loader = () => (
     <div className="flex justify-center py-6">
         <div className="w-5 h-5 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
@@ -11,55 +12,141 @@ const Loader = () => (
 );
 
 const Feed = ({ activeTab }) => {
-    const [posts, setPosts] = useState([]); // post list ka state
-    const [lastVisible, setLastVisible] = useState(null); // last document for pagination
-    const [hasMore, setHasMore] = useState(true); // check karega ki aur posts available hain ya nahi
-    const [isLoading, setIsLoading] = useState(false); // loading indicator ke liye
-    const currentUserId = sessionStorage.getItem("userID"); // current logged-in user ka ID
+    const [posts, setPosts] = useState([]);
+    const [lastVisible, setLastVisible] = useState(null);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const currentUserId = sessionStorage.getItem("userID");
+    const observer = useRef();
 
-    // jab bhi tab change ho (foryou ya following), posts reset karo
+    // Tab change hone par state reset karna & naye data fetch karna
     useEffect(() => {
         setPosts([]);
         setLastVisible(null);
         setHasMore(true);
-        fetchInitialPosts(); // naye tab ke hisaab se data fetch karo
+        fetchInitialPosts();
     }, [activeTab]);
 
-    // Initial post load karne ka function
+    // Initial posts fetch karne ka function
     const fetchInitialPosts = async () => {
         setIsLoading(true);
+
         const fetchedPosts = [];
         let lastDoc = null;
-        const maxTries = activeTab === "foryou" ? 1 : 5; // following tab me zyada try karega
+
+        // Jab 'foryou' tab ho to sirf ek baar try karega
+        // 'following' tab me multiple tries (maxTries = 5) allow karega kyunki filter lagta hai
+        const maxTries = activeTab === "foryou" ? 1 : 5;
         let tries = 0;
 
-        // 10 posts tak data fetch karne ki koshish karta hai
+        // Jab tak 10 posts nahi mil jaati ya maxTries cross nahi ho jati
         while (fetchedPosts.length < 10 && tries < maxTries) {
-            const q = lastDoc
+            const postsQuery = lastDoc
                 ? query(collection(db, "posts"), orderBy("createdAt", "desc"), startAfter(lastDoc), limit(10))
                 : query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(10));
 
-            const snapshot = await getDocs(q);
+            const snapshot = await getDocs(postsQuery);
+
             if (snapshot.empty) break;
 
             lastDoc = snapshot.docs[snapshot.docs.length - 1];
             tries++;
 
-            // Har post ke user ka data parallel fetch karo
-            const postData = await Promise.all(snapshot.docs.map(async (docSnap) => {
+            // Har post ke associated user data ko fetch karna
+            const postData = await Promise.all(
+                snapshot.docs.map(async (docSnap) => {
+                    const data = docSnap.data();
+
+                    try {
+                        const userDocRef = doc(db, "users", data.userId);
+                        const userDoc = await getDoc(userDocRef);
+                        const userData = userDoc.exists() ? userDoc.data() : {};
+
+                        const { viewType, userId: postUserId } = data;
+
+                        let shouldAdd = false;
+
+                        if (activeTab === "foryou") {
+                            // "foryou" tab me sirf public posts dikhni chahiye
+                            shouldAdd = viewType === "EveryOne";
+                        } else if (activeTab === "following") {
+                            // "following" tab me real-time follower check karenge
+                            if (["Followers", "FriendsOnly"].includes(viewType)) {
+                                shouldAdd = await checkIfUserIsFollower(postUserId, currentUserId);
+                            }
+                        }
+
+                        if (shouldAdd) {
+                            return {
+                                id: docSnap.id,
+                                ...data,
+                                username: userData.username,
+                                fullName: userData.fullName,
+                                profileDP: userData.dp
+                            };
+                        }
+                    } catch (error) {
+                        console.error("Error fetching user or checking follower:", error);
+                    }
+
+                    return null; // Agar condition match nahi hui ya koi error aaya
+                })
+            );
+
+
+            // Valid posts list me add karna
+            fetchedPosts.push(...postData.filter(Boolean));
+        }
+
+        // Final state update
+        setPosts(fetchedPosts);
+        setLastVisible(lastDoc);
+        setHasMore(fetchedPosts.length >= 10 || tries >= maxTries);
+        setIsLoading(false);
+    };
+
+    // Scroll hone par aur posts fetch karne ka function
+    const fetchMorePosts = async () => {
+        if (!lastVisible || isLoading) return;
+
+        setIsLoading(true);
+
+        const postsQuery = query(
+            collection(db, "posts"),
+            orderBy("createdAt", "desc"),
+            startAfter(lastVisible),
+            limit(10)
+        );
+
+        const snapshot = await getDocs(postsQuery);
+        if (snapshot.empty) {
+            setHasMore(false);
+            setIsLoading(false);
+            return;
+        }
+
+        const postData = await Promise.all(
+            snapshot.docs.map(async (docSnap) => {
                 const data = docSnap.data();
+
                 try {
                     const userDocRef = doc(db, "users", data.userId);
                     const userDoc = await getDoc(userDocRef);
                     const userData = userDoc.exists() ? userDoc.data() : {};
 
-                    // Tab ke hisaab se filter lagana
-                    const shouldAdd =
-                        activeTab === "foryou"
-                            ? data.viewType === "EveryOne"
-                            : (["Followers", "FriendsOnly"].includes(data.viewType) &&
-                                Array.isArray(userData.followers) &&
-                                userData.followers.includes(currentUserId));
+                    const { viewType, userId: postUserId } = data;
+
+                    let shouldAdd = false;
+
+                    if (activeTab === "foryou") {
+                        // "foryou" tab me sirf public posts dikhni chahiye
+                        shouldAdd = viewType === "EveryOne";
+                    } else if (activeTab === "following") {
+                        // "following" tab me real-time follower check karenge
+                        if (["Followers", "FriendsOnly"].includes(viewType)) {
+                            shouldAdd = await checkIfUserIsFollower(postUserId, currentUserId);
+                        }
+                    }
 
                     if (shouldAdd) {
                         return {
@@ -71,84 +158,32 @@ const Feed = ({ activeTab }) => {
                         };
                     }
                 } catch (error) {
-                    console.error("Error fetching user:", error);
+                    console.error("Error fetching user or checking follower:", error);
                 }
-                return null; // agar user nahi mila ya kuch error aaya to skip karo
-            }));
 
-            fetchedPosts.push(...postData.filter(Boolean)); // valid posts add karo
-        }
-
-        // Final state update
-        setPosts(fetchedPosts);
-        setLastVisible(lastDoc);
-        setHasMore(fetchedPosts.length >= 10 || tries >= maxTries); // agar aur data ho to load hone do
-        setIsLoading(false);
-    };
-
-    // Scroll ke time pe aur data fetch karne ka function
-    const fetchMorePosts = async () => {
-        if (!lastVisible || isLoading) return;
-        setIsLoading(true);
-
-        const q = query(
-            collection(db, "posts"),
-            orderBy("createdAt", "desc"),
-            startAfter(lastVisible),
-            limit(10)
+                return null; // Agar condition match nahi hui ya koi error aaya
+            })
         );
-        const snapshot = await getDocs(q);
-        if (snapshot.empty) {
-            setHasMore(false); // agar data khatam ho gaya
-            setIsLoading(false);
-            return;
-        }
 
-        const postData = await Promise.all(snapshot.docs.map(async (docSnap) => {
-            const data = docSnap.data();
-            try {
-                const userDoc = await getDoc(doc(db, "users", data.userId));
-                const userData = userDoc.exists() ? userDoc.data() : {};
-
-                const shouldAdd =
-                    activeTab === "foryou"
-                        ? data.viewType === "EveryOne"
-                        : data.viewType === "Followers" &&
-                        Array.isArray(userData.followers) &&
-                        userData.followers.includes(currentUserId);
-
-                if (shouldAdd) {
-                    return {
-                        id: docSnap.id,
-                        ...data,
-                        username: userData.username,
-                        fullName: userData.fullName,
-                        profileDP: userData.dp
-                    };
-                }
-            } catch (error) {
-                console.error("User fetch error:", error);
-            }
-            return null;
-        }));
-
-        setPosts((prev) => [...prev, ...postData.filter(Boolean)]); // pehle wale posts ke sath naye jod do
+        setPosts((prevPosts) => [...prevPosts, ...postData.filter(Boolean)]);
         setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
-        setHasMore(snapshot.docs.length === 10); // agar 10 se kam aaye, to aur nahi hai
+        setHasMore(snapshot.docs.length === 10);
         setIsLoading(false);
     };
 
-    // Intersection Observer for infinite scroll
-    const observer = useRef();
+    // Last element ke reference ke liye intersection observer (infinite scroll)
     const lastPostRef = useCallback(
         (node) => {
             if (isLoading) return;
+
             if (observer.current) observer.current.disconnect();
+
             observer.current = new IntersectionObserver((entries) => {
                 if (entries[0].isIntersecting && hasMore) {
                     fetchMorePosts();
                 }
             });
+
             if (node) observer.current.observe(node);
         },
         [isLoading, hasMore]
@@ -156,7 +191,8 @@ const Feed = ({ activeTab }) => {
 
     return (
         <div className="space-y-4">
-            {/* Agar koi post nahi hai aur loading nahi ho rahi */}
+
+            {/* Jab koi post available na ho aur loading bhi na ho */}
             {posts.length === 0 && !isLoading ? (
                 <p className="text-center text-gray-500 dark:text-gray-400 py-10">
                     No posts to show right now.
@@ -173,13 +209,14 @@ const Feed = ({ activeTab }) => {
                     )
                 )
             )}
-            {/* Loader jab data load ho raha ho */}
+
+            {/* Loader jab data fetch ho raha ho */}
             {isLoading && <Loader />}
 
-            {/* Jab saara data aa gaya ho */}
+            {/* Jab saara data load ho chuka ho */}
             {!hasMore && !isLoading && posts.length > 0 && (
                 <p className="text-center text-gray-500 dark:text-gray-400 py-4">
-                    You’re all caught up! 🎉
+                    You’re all caught up!
                 </p>
             )}
         </div>
