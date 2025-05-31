@@ -5,6 +5,8 @@ import { db, storage } from "../configuration/firebaseConfig";
 import compressImage from '../utils/imageCompressor';
 import { getFollowCounts } from "../utils/followUtils";
 import { useLocation, useNavigate } from 'react-router-dom';
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { deletePost } from "../utils/uploadPost";
 
 const ProfilePage = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -229,11 +231,25 @@ const ProfilePage = () => {
     const handlePostClick = (postId) => {
         //console.log("Clicked post with ID:", postId);
     };
-    const handleEdit = (postId) => {
-        //console.log("Edit post with ID:", postId);
+    const handleEdit = (postId, userId) => {
+        console.log("Editing Post ID", postId, "by User", userId);
+        // 👉 Edit logic here...
     };
-    const handleDelete = (postId) => {
-        //console.log("Delete post with ID:", postId);
+
+    const handleDelete = (postId, postUserId) => {
+        if (postUserId === uid) {
+            const isConfirmed = window.confirm("Are you sure you want to delete this post?");
+            if (isConfirmed) {
+                console.log("Deleting Post ID", postId, "post.userId", postUserId, "LoggedIn user", uid);
+                deletePost(postId);
+            } else {
+                console.log("User canceled the delete operation.");
+            }
+        } else {
+            console.log("User", postUserId);
+            console.log("Current User", uid);
+            console.log("You cannot delete this post.");
+        }
     };
 
     // input change
@@ -254,6 +270,7 @@ const ProfilePage = () => {
         }
     };
 
+
     return (
         <div className="min-h-screen pt-8 pb-10 px-4 bg-light-bg dark:bg-dark-bg text-text-light dark:text-text-dark transition-colors duration-300">
             {/*  Loader pehle hi return me conditionally dikhate hain */}
@@ -271,7 +288,7 @@ const ProfilePage = () => {
             <div className="max-w-6xl mx-auto py-8">
                 <div className="text-center">
                     <h1 className="text-3xl font-bold text-brand-orange mb-4">Profile Section</h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                         View and update your personal information
                     </p>
                 </div>
@@ -465,16 +482,16 @@ const ProfilePage = () => {
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
                         Your Posts
                     </h2>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[500px] overflow-y-auto pr-2">
                         {posts.length > 0 ? (
                             posts.map((post) => (
                                 <div
                                     key={post.id}
                                     className="relative bg-light-card dark:bg-[#1a1a1a] rounded-lg border border-gray-300 dark:border-gray-700 p-4 group"
-                                    onClick={() => handlePostClick(post.id)} // Attach handlePostClick here
+                                    onClick={() => handlePostClick(post.id)}
                                 >
                                     {/* Post Image */}
-
                                     <div className="w-full h-40 overflow-hidden rounded-lg">
                                         {post.mediaURL ? (
                                             <img
@@ -496,31 +513,35 @@ const ProfilePage = () => {
 
                                     {/* Post Description */}
                                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                        {post.content ? post.content.slice(0, 100) + "..." : "No content available"}
+                                        {post.content
+                                            ? post.content.slice(0, 100) + "..."
+                                            : "No content available"}
                                     </p>
 
-                                    {/* Hover buttons (Edit/Delete) */}
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    {/* Action Icons */}
+                                    <div className="absolute top-2 right-2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                         {/* Edit Button */}
                                         <button
                                             onClick={(e) => {
-                                                e.stopPropagation(); // Prevent post click when clicking Edit button
-                                                handleEdit(post.id);
+                                                e.stopPropagation();
+                                                handleEdit(post.id, post.userId);
                                             }}
-                                            className="text-base font-bold text-blue-900 dark:text-blue-900 hover:bg-blue-700 hover:text-white dark:hover:bg-blue-700 dark:hover:text-white px-3 py-1 rounded-lg transition-colors duration-200"
+                                            className="p-2 bg-brand-orange hover:bg-blue-600 hover:text-white text-blue-700 dark:hover:text-white rounded-full transition-all duration-200"
+                                            title="Edit Post"
                                         >
-                                            Edit
+                                            <FaEdit className="w-4 h-4" />
                                         </button>
 
                                         {/* Delete Button */}
                                         <button
                                             onClick={(e) => {
-                                                e.stopPropagation(); // Prevent post click when clicking Delete button
-                                                handleDelete(post.id);
+                                                e.stopPropagation();
+                                                handleDelete(post.id, post.userId);
                                             }}
-                                            className="text-base font-bold text-red-900 dark:text-red-900 hover:bg-red-700 hover:text-white dark:hover:bg-red-700 dark:hover:text-white px-3 py-1 rounded-lg transition-colors duration-200 mt-2 sm:mt-0"
+                                            className="p-2 bg-brand-orange hover:bg-red-600 hover:text-white text-black dark:hover:text-white rounded-full transition-all duration-200"
+                                            title="Delete Post"
                                         >
-                                            Delete
+                                            <FaTrash className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>
