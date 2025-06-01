@@ -231,9 +231,20 @@ const ProfilePage = () => {
     const handlePostClick = (postId) => {
         //console.log("Clicked post with ID:", postId);
     };
-    const handleEdit = (postId, userId) => {
-        console.log("Editing Post ID", postId, "by User", userId);
-        // 👉 Edit logic here...
+    const handleEdit = (postId, postUserId) => {
+        if (postUserId === uid) {
+            const isConfirmed = window.confirm("Are you sure, you want to edit this post?");
+            if (isConfirmed) {
+                console.log("Editing Post ID", postId, "post.userId", postUserId, "LoggedIn user", uid);
+                navigate(`/editpost/${postId}`);
+            } else {
+                console.log("User canceled the edit operation.");
+            }
+        } else {
+            console.log("Post creater ", postUserId);
+            console.log("Current User ", uid);
+            console.log("You cannot edit this post. ");
+        }
     };
 
     const handleDelete = (postId, postUserId) => {

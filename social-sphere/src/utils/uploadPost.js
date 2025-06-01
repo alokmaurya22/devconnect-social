@@ -49,9 +49,7 @@ export const uploadPost = async ({ title, content, tag, file, viewtype }) => {
  */
 export const editPost = async (postId, updatedData) => {
     if (!postId || !updatedData) throw new Error("Invalid input for editPost");
-
     const postRef = doc(db, "posts", postId);
-
     const updates = {
         ...updatedData,
         editedAt: serverTimestamp(), // Store edit time

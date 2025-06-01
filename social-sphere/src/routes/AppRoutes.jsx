@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 import SignUp from "../pages/Signup";
 import Home from "../pages/Home";
-import CreatePost from "../pages/CreatePost";
+import EditPost from "../pages/EditPost";
 import Chats from "../pages/Chats";
 import ProfilePage from "../pages/ProfilePage";
 import UserProfilePage from "../pages/UserProfilePage";
@@ -25,7 +25,7 @@ const AppRoutes = () => {
 
             {/* Protected routes access after login */}
             <Route path="/home" element={<ProtectedRoute element={<Home />} allowedRoutes={allowedRoutes} />} />
-            <Route path="/createPost" element={<ProtectedRoute element={<CreatePost />} allowedRoutes={allowedRoutes} />} />
+            <Route path="/editpost/:postId" element={<ProtectedRoute element={<EditPost />} allowedRoutes={allowedRoutes} />} />
             <Route path="/chats" element={<ProtectedRoute element={<Chats />} allowedRoutes={allowedRoutes} />} />
             <Route path="/chats/:chatUserID" element={<ProtectedRoute element={<Chats />} allowedRoutes={allowedRoutes} />} />
             <Route path="/user/:userId" element={<ProtectedRoute element={<UserProfilePage />} allowedRoutes={allowedRoutes} />} />
