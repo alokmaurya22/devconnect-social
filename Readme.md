@@ -22,6 +22,5 @@
 
 ## 📸 Screenshots
 
-> _(UI screenshots here in the future)_
+> ![image](https://github.com/user-attachments/assets/57e10d34-e875-419a-8803-2504f8149e6d)
 
-## 📦 Folder Structure
