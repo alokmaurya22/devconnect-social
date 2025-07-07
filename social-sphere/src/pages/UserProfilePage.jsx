@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../configuration/firebaseConfig";
 import { FaComment } from "react-icons/fa";
-import { followUser, unfollowUser, checkIfFollowing, getFollowCounts } from "../utils/followUtils";
+import { followUser, unfollowUser, checkIfFollowing, getFollowCounts, checkIfUserIsFollower } from "../utils/followUtils";
+import PostCard from "../components/PostCard";
 
 const UserProfilePage = () => {
     const { userId: searchedUserID } = useParams();
@@ -11,7 +12,11 @@ const UserProfilePage = () => {
     const [followersCount, setFollowersCount] = useState(0);
     const [followingCount, setFollowingCount] = useState(0);
     const [isFollowing, setIsFollowing] = useState(false);
+    const [posts, setPosts] = useState([]);
+    const [postsLoading, setPostsLoading] = useState(true);
+    const [isFollower, setIsFollower] = useState(false);
     const loggedUserID = sessionStorage.getItem("userID");
+    const [visibleCount, setVisibleCount] = useState(10);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -51,10 +56,37 @@ const UserProfilePage = () => {
             setIsFollowing(result);
         }
     };
+
+    const checkFollowerStatus = async () => {
+        if (!loggedUserID || !searchedUserID || loggedUserID === searchedUserID) {
+            setIsFollower(false);
+            return;
+        }
+        const follower = await checkIfUserIsFollower(searchedUserID, loggedUserID);
+        setIsFollower(follower);
+    };
+
+    const fetchPosts = async () => {
+        setPostsLoading(true);
+        const q = query(collection(db, "posts"), where("userId", "==", searchedUserID));
+        const querySnapshot = await getDocs(q);
+        let postsArray = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Filter posts by viewType
+        postsArray = postsArray.filter(post => {
+            if (post.viewType === "EveryOne") return true;
+            if (post.viewType === "FriendsOnly") return isFollower;
+            return false; // Hide Private or Draft
+        });
+        setPosts(postsArray);
+        setPostsLoading(false);
+    };
+
     useEffect(() => {
         fetchUserData();
         fetchFollowCounts();
         updateFollowStatus();
+        fetchPosts();
+        checkFollowerStatus();
     }, [searchedUserID]);
 
     const handleFollow = async () => {
@@ -169,6 +201,38 @@ const UserProfilePage = () => {
                             </button>
                         </div>
                     </div>
+                </div>
+
+                {/* User's Posts Section */}
+                <div className="bg-white dark:bg-dark-card rounded-xl shadow-xl p-6 md:p-8 mt-8">
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+                        {userData.fullName}'s Posts
+                    </h2>
+                    {postsLoading ? (
+                        <div className="text-center text-gray-500 dark:text-gray-400">Loading posts...</div>
+                    ) : posts.length > 0 ? (
+                        <>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[500px] overflow-y-auto pr-2">
+                                {posts.slice(0, visibleCount).map((post) => (
+                                    <div className="border-2 border-gray-300 dark:border-gray-700 rounded-lg shadow-md bg-white dark:bg-[#181818] p-2" key={post.id}>
+                                        <PostCard post={post} />
+                                    </div>
+                                ))}
+                            </div>
+                            {visibleCount < posts.length && (
+                                <div className="flex justify-center mt-4">
+                                    <button
+                                        className="px-4 py-2 bg-brand-orange text-white rounded shadow hover:bg-brand-orange-hover transition"
+                                        onClick={() => setVisibleCount(v => v + 10)}
+                                    >
+                                        Show more
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <p className="text-sm text-gray-500 dark:text-gray-400">No posts to show.</p>
+                    )}
                 </div>
             </div>
         </div>

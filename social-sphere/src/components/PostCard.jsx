@@ -4,11 +4,14 @@ import PostActions from "./PostActions";
 import Comments from "./Comments";
 import { followUser, checkIfFollowing } from "../utils/followUtils";
 import { useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../configuration/firebaseConfig";
 
 const PostCard = ({ post }) => {
     const [showComments, setShowComments] = useState(false);
     const [showFollow, setShowFollow] = useState(false);
     const [followLoading, setFollowLoading] = useState(false);
+    const [userInfo, setUserInfo] = useState({ fullName: post.fullName, username: post.username, profileDP: post.profileDP });
     const userId = sessionStorage.getItem("userID");
     const navigate = useNavigate();
 
@@ -25,6 +28,26 @@ const PostCard = ({ post }) => {
         checkFollow();
         return () => { ignore = true; };
     }, [userId, post.userId]);
+
+    useEffect(() => {
+        let ignore = false;
+        const fetchUserInfo = async () => {
+            if (post.fullName && post.username && post.profileDP !== undefined) return;
+            if (!post.userId) return;
+            const userRef = doc(db, "users", post.userId);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists() && !ignore) {
+                const data = userSnap.data();
+                setUserInfo({
+                    fullName: data.fullName || data.name || "User",
+                    username: data.username || "user",
+                    profileDP: data.dp || undefined,
+                });
+            }
+        };
+        fetchUserInfo();
+        return () => { ignore = true; };
+    }, [post.fullName, post.username, post.profileDP, post.userId]);
 
     const handleFollow = async () => {
         setFollowLoading(true);
@@ -46,9 +69,9 @@ const PostCard = ({ post }) => {
             {/* Top: User Info */}
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                    {post.profileDP ? (
+                    {userInfo.profileDP ? (
                         <img
-                            src={post.profileDP}
+                            src={userInfo.profileDP}
                             alt="User DP"
                             className="w-8 h-8 rounded-full object-cover cursor-pointer"
                             onClick={goToUserProfile}
@@ -58,7 +81,7 @@ const PostCard = ({ post }) => {
                     )}
                     <div className="flex flex-col">
                         <div className="flex items-center gap-2">
-                            <span className="font-semibold text-brand-orange text-lg cursor-pointer" onClick={goToUserProfile}>{post.fullName}</span>
+                            <span className="font-semibold text-brand-orange text-lg cursor-pointer" onClick={goToUserProfile}>{userInfo.fullName || "User"}</span>
                             {showFollow && (
                                 <button
                                     className="px-1 py-0 text-sm font-medium bg-green-500 hover:bg-green-600 text-black rounded shadow focus:outline-none focus:ring-2 focus:ring-green-400 transition disabled:opacity-60"
@@ -69,7 +92,7 @@ const PostCard = ({ post }) => {
                                 </button>
                             )}
                         </div>
-                        <span className="block text-blue-900 dark:text-blue-400 text-sm mt-0 cursor-pointer" onClick={goToUserProfile}>@{post.username}</span>
+                        <span className="block text-blue-900 dark:text-blue-400 text-sm mt-0 cursor-pointer" onClick={goToUserProfile}>@{userInfo.username || "user"}</span>
                     </div>
                 </div>
                 <span className="text-sm text-gray-500 dark:text-gray-400">{postTime}</span>
