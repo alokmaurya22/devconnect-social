@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 // Tab Button
 export const TabButton = ({ label, value, activeTab, setActiveTab }) => (
@@ -23,18 +24,30 @@ export const SidebarItem = ({ icon, label }) => (
 );
 
 // Trending Tag
-export const TrendingItem = ({ tag }) => (
-    <p className="text-sm text-gray-700 dark:text-gray-300 hover:underline cursor-pointer mb-2">
-        {tag}
-    </p>
-);
-
-// Follow Suggestion
-export const FollowSuggestion = ({ name }) => (
+export const TrendingItem = ({ tag, postId, onView }) => (
     <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium">{name}</span>
-        <button className="bg-brand-orange text-white text-sm px-2 py-1 rounded-full hover:bg-brand-orange-hover transition">
-            Follow
+        <span className="text-sm text-gray-700 dark:text-gray-300">{tag}</span>
+        <button
+            className="bg-brand-orange text-white text-xs px-2 py-1 rounded-full hover:bg-brand-orange-hover transition ml-2"
+            onClick={() => onView(postId)}
+        >
+            View
         </button>
     </div>
 );
+
+// Follow Suggestion
+export const FollowSuggestion = ({ name, userId }) => {
+    const navigate = useNavigate();
+    return (
+        <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium">{name}</span>
+            <button
+                className="bg-brand-orange text-white text-sm px-2 py-1 rounded-full hover:bg-brand-orange-hover transition"
+                onClick={() => navigate(`/user/${userId}`)}
+            >
+                View
+            </button>
+        </div>
+    );
+};

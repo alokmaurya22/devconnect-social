@@ -1,7 +1,70 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { TrendingItem, FollowSuggestion } from "./ImportantComponents";
+import { db } from "../../configuration/firebaseConfig";
+import { collection, getDocs } from "firebase/firestore";
+import PostModal from "../modal/PostModal";
 
 const RightSidebar = () => {
+    const [trendingPosts, setTrendingPosts] = useState([]);
+    const [topUsers, setTopUsers] = useState([]);
+    const [showPostModal, setShowPostModal] = useState(false);
+    const [selectedPostId, setSelectedPostId] = useState(null);
+
+    useEffect(() => {
+        // Fetch top 3 trending posts by likes
+        const fetchTrendingPosts = async () => {
+            const postsSnapshot = await getDocs(collection(db, "posts"));
+            const posts = await Promise.all(
+                postsSnapshot.docs.map(async (docSnap) => {
+                    const data = docSnap.data();
+                    // Count likes
+                    const likesSnapshot = await getDocs(collection(db, "posts", docSnap.id, "likes"));
+                    return {
+                        id: docSnap.id,
+                        title: data.title || "(No Title)",
+                        likeCount: likesSnapshot.size,
+                    };
+                })
+            );
+            // Sort by likeCount desc, take top 3
+            const topTrending = posts.sort((a, b) => b.likeCount - a.likeCount).slice(0, 3);
+            setTrendingPosts(topTrending);
+        };
+
+        // Fetch top 3 users by followers
+        const fetchTopUsers = async () => {
+            const usersSnapshot = await getDocs(collection(db, "users"));
+            const users = await Promise.all(
+                usersSnapshot.docs.map(async (docSnap) => {
+                    const data = docSnap.data();
+                    // Count followers
+                    const followersSnapshot = await getDocs(collection(db, "users", docSnap.id, "followers"));
+                    return {
+                        id: docSnap.id,
+                        name: data.fullName || data.username || "Unknown",
+                        followerCount: followersSnapshot.size,
+                    };
+                })
+            );
+            // Sort by followerCount desc, take top 3
+            const top = users.sort((a, b) => b.followerCount - a.followerCount).slice(0, 3);
+            setTopUsers(top);
+        };
+
+        fetchTrendingPosts();
+        fetchTopUsers();
+    }, []);
+
+    const handleViewPost = (postId) => {
+        setSelectedPostId(postId);
+        setShowPostModal(true);
+    };
+
+    const handleClosePostModal = () => {
+        setShowPostModal(false);
+        setSelectedPostId(null);
+    };
+
     return (
         <>
             {/* Desktop View */}
@@ -19,18 +82,29 @@ const RightSidebar = () => {
                 />
 
                 <div className="bg-white dark:bg-dark-card rounded-lg shadow p-4 mt-4 mx-6">
-                    <h3 className="font-bold text-lg mb-3">What’s happening</h3>
-                    <TrendingItem tag="#100DaysChallenge" />
-                    <TrendingItem tag="#ReactJS" />
-                    <TrendingItem tag="#India" />
+                    <h3 className="font-bold text-lg mb-3">What's happening</h3>
+                    {trendingPosts.length === 0 ? (
+                        <p className="text-sm text-gray-400">No trending posts.</p>
+                    ) : (
+                        trendingPosts.map((post) => (
+                            <TrendingItem key={post.id} tag={post.title} postId={post.id} onView={handleViewPost} />
+                        ))
+                    )}
                 </div>
                 <div className="bg-white dark:bg-dark-card rounded-lg shadow p-4 mt-4 mx-6">
                     <h3 className="font-bold text-lg mb-3">Who to follow</h3>
-                    <FollowSuggestion name="Anuj Gupta" />
-                    <FollowSuggestion name="Alok Maurya" />
-                    <FollowSuggestion name="Naveen Tiwari" />
+                    {topUsers.length === 0 ? (
+                        <p className="text-sm text-gray-400">No suggestions.</p>
+                    ) : (
+                        topUsers.map((user) => (
+                            <FollowSuggestion key={user.id} name={user.name} userId={user.id} />
+                        ))
+                    )}
                 </div>
             </aside>
+            {showPostModal && (
+                <PostModal postId={selectedPostId} onClose={handleClosePostModal} />
+            )}
         </>
     );
 };
