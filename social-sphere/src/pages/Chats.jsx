@@ -1,8 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Smile, Send, ArrowLeft } from 'lucide-react';
+import { Smile, Send, ArrowLeft, Paperclip, Trash2 } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
 import { useChatLogic } from '../utils/chatUtils/chatLogic';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../configuration/firebaseConfig";
+import compressImage from '../utils/imageCompressor';
 
 const Chats = () => {
     const [messageText, setMessageText] = useState('');
@@ -11,16 +14,20 @@ const Chats = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const { chatUserID } = useParams();
     const navigate = useNavigate();
     const messageEndRef = useRef(null);
     const emojiRef = useRef(null);
     const loggedUserId = sessionStorage.getItem('userID');
+    const [selectedFile, setSelectedFile] = useState(null);
+    const fileInputRef = useRef(null);
+    const [fileReady, setFileReady] = useState(false);
+    const [imageModal, setImageModal] = useState({ open: false, url: '', name: '' });
+    const [imageSending, setImageSending] = useState(false);
 
-    const { handleSendMessage, handleOutsideClick } = useChatLogic({ chatUserID, loggedUserId, chatUsers, setChatUsers, setSelectedUser, setMessages, selectedUser, setError, setLoading, messageEndRef });
+    const { handleSendMessage, useOutsideClick } = useChatLogic({ chatUserID, loggedUserId, chatUsers, setChatUsers, setSelectedUser, setMessages, selectedUser, setError: () => { }, setLoading, messageEndRef });
 
-    handleOutsideClick(emojiRef, setShowEmojiPicker);
+    useOutsideClick(emojiRef, setShowEmojiPicker);
 
     const handleEmojiClick = (emojiData) => {
         setMessageText((prev) => prev + emojiData.emoji);
@@ -75,9 +82,67 @@ const Chats = () => {
                 selectedUser,
                 loggedUserId,
                 setMessageText,
-                setError
+                setError: () => { }
             });
         }
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            setFileReady(false);
+        }
+    };
+
+    useEffect(() => {
+        if (selectedFile) setFileReady(true);
+    }, [selectedFile]);
+
+    const handleSendFile = async () => {
+        if (!selectedFile) return;
+        try {
+            let fileToUpload = selectedFile;
+            const isImage = selectedFile.type.startsWith('image');
+            if (isImage) {
+                setImageSending(true);
+                fileToUpload = await compressImage(selectedFile, 0.3); // 0.3 MB max
+            }
+            const fileExtension = selectedFile.name.split('.').pop();
+            const fileName = `${loggedUserId}_${Date.now()}.${fileExtension}`;
+            const fileRef = ref(storage, `chatFiles/${fileName}`);
+            await uploadBytes(fileRef, fileToUpload);
+            const fileURL = await getDownloadURL(fileRef);
+            handleSendMessage({
+                messageText: isImage ? "[Image]" : "[File]",
+                fileURL,
+                fileType: selectedFile.type,
+                fileName: selectedFile.name,
+                selectedUser,
+                loggedUserId,
+                setMessageText,
+                setError: () => { }
+            });
+        } catch {
+            alert("Failed to upload file.");
+        }
+        setSelectedFile(null);
+        setFileReady(false);
+        setImageSending(false);
+    };
+
+    // Modal for image preview
+    const ImageModal = ({ open, url, name, onClose }) => {
+        if (!open) return null;
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={onClose}>
+                <div className="bg-white dark:bg-dark-card rounded-lg shadow-lg p-4 max-w-2xl w-full relative" onClick={e => e.stopPropagation()}>
+                    <button className="absolute top-2 right-2 text-2xl text-gray-600 hover:text-red-500" onClick={onClose}>&times;</button>
+                    <img src={url} alt={name} className="max-w-full max-h-[70vh] mx-auto rounded" />
+                    <div className="text-center text-xs text-gray-500 mt-2">{name}</div>
+                </div>
+            </div>
+        );
     };
 
     return (
@@ -159,20 +224,45 @@ const Chats = () => {
 
                     {/* Messages Container */}
                     <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3 bg-background">
-                        {messages.map((msg) => {
+                        {messages.map((msg, idx) => {
                             const isSent = msg.senderId === loggedUserId;
+                            const prevMsg = messages[idx - 1];
+                            const showAvatar = !isSent && (!prevMsg || prevMsg.senderId !== msg.senderId);
                             return (
-                                <div key={msg.id} className={`flex ${isSent ? "justify-end" : "justify-start"}`}>
-                                    <div className={`max-w-[75%] rounded-xl px-4 py-1 text-sm md:text-base ${isSent ? "bg-brand-orange text-white" : "bg-blue-600 text-white"}`}>
-                                        <p>{msg.text}</p>
-                                        <p className={`text-xs mt-1 ${isSent ? "text-orange-100" : "text-blue-100"}`}>
-                                            {formatDateTime(msg.createdAt)}
+                                <div key={msg.id} className={`flex ${isSent ? "justify-end" : "justify-start"} group transition-all duration-200`}>
+                                    {!isSent && showAvatar && (
+                                        <img
+                                            src={selectedUser.dp}
+                                            alt={selectedUser.name}
+                                            className="w-7 h-7 rounded-full object-cover mr-2 self-end mb-1"
+                                        />
+                                    )}
+                                    <div className={`max-w-[75%] rounded-xl px-4 py-1 text-sm md:text-base relative ${isSent ? "bg-brand-orange text-white" : "bg-blue-600 text-white"} shadow-sm transition-all duration-200`}>
+                                        {msg.fileURL ? (
+                                            msg.fileType && msg.fileType.startsWith('image') ? (
+                                                <button
+                                                    className="inline-flex items-center gap-2 px-4 py-1 rounded-lg bg-gradient-to-r from-orange-400 to-blue-500 text-white font-semibold shadow hover:from-orange-500 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-orange-300 transition mb-1"
+                                                    onClick={e => { e.preventDefault(); setImageModal({ open: true, url: msg.fileURL, name: msg.fileName || 'Image' }); }}
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5V6.75A2.25 2.25 0 015.25 4.5h13.5A2.25 2.25 0 0121 6.75v10.5m-18 0A2.25 2.25 0 005.25 19.5h13.5A2.25 2.25 0 0021 16.5m-18 0v-1.372a2.25 2.25 0 01.563-1.504l3.75-4.286a2.25 2.25 0 013.374 0l1.25 1.429m0 0l.75-.857a2.25 2.25 0 013.374 0l3.75 4.286a2.25 2.25 0 01.563 1.504V16.5m-9-5.25h.008v.008H12v-.008z" /></svg>
+                                                    View Image
+                                                </button>
+                                            ) : (
+                                                <a href={msg.fileURL} target="_blank" rel="noopener noreferrer" className="underline break-all block mb-1">{msg.fileName || 'Download file'}</a>
+                                            )
+                                        ) : (
+                                            <p>{msg.text}</p>
+                                        )}
+                                        <div className="flex items-center justify-between mt-1">
+                                            <span className={`text-xs ${isSent ? "text-orange-100" : "text-blue-100"}`}>{formatDateTime(msg.createdAt)}</span>
                                             {isSent && (
                                                 <span className="ml-2">
                                                     {msg.status === 'read' ? '✓✓' : '✓'}
                                                 </span>
                                             )}
-                                        </p>
+                                            {/* Placeholder for reactions */}
+                                            <span className="ml-2 opacity-0 group-hover:opacity-100 transition cursor-pointer">😊</span>
+                                        </div>
                                     </div>
                                 </div>
                             );
@@ -181,7 +271,45 @@ const Chats = () => {
                     </div>
 
                     {/* Message Input */}
-                    <div className="px-4 py-3 border-t border-border bg-card relative">
+                    {selectedFile && (
+                        <div className="flex items-center justify-between gap-2 mb-2 bg-gray-100 dark:bg-gray-800 p-2 px-4 rounded">
+                            <div className="flex items-center gap-2">
+                                {selectedFile.type.startsWith('image') ? (
+                                    <img src={URL.createObjectURL(selectedFile)} alt="preview" className="w-16 h-16 object-cover rounded" />
+                                ) : (
+                                    <span className="text-sm">{selectedFile.name}</span>
+                                )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {!imageSending && (
+                                    <>
+                                        <button
+                                            className="p-2 ml-2 rounded-full bg-red-500 text-white hover:bg-red-700 transition flex items-center justify-center"
+                                            onClick={() => { setSelectedFile(null); setFileReady(false); }}
+                                            title="Remove file"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            className={`px-3 py-1 rounded bg-brand-orange text-white font-semibold ml-2 transition ${fileReady ? 'hover:bg-orange-600' : 'opacity-50 cursor-not-allowed'}`}
+                                            onClick={handleSendFile}
+                                            disabled={!fileReady || imageSending}
+                                        >
+                                            Send
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                            {/* Loading spinner for image sending */}
+                            {selectedFile.type.startsWith('image') && imageSending && (
+                                <div className="flex items-center ml-4">
+                                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-brand-orange"></div>
+                                    <span className="ml-2 text-sm text-orange-600">Uploading...</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    <div className="px-4 py-2 border-t border-border bg-card relative">
                         {showEmojiPicker && (
                             <div ref={emojiRef} className="absolute bottom-16 left-4 z-50">
                                 <EmojiPicker
@@ -194,26 +322,39 @@ const Chats = () => {
                                 />
                             </div>
                         )}
-
                         <div className="flex items-center gap-2">
                             <button
                                 className="p-2 rounded-full hover:bg-muted transition"
-                                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                onClick={() => setShowEmojiPicker((v) => !v)}
+                                title="Emoji"
                             >
-                                <Smile className="w-5 h-5 text-brand-orange" />
+                                <Smile className="w-5 h-5" />
+                            </button>
+                            <button
+                                className="p-2 rounded-full hover:bg-muted transition"
+                                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                                title="Attach file"
+                            >
+                                <Paperclip className="w-5 h-5" />
                             </button>
                             <input
-                                type="text"
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                onChange={handleFileChange}
+                            />
+                            <textarea
+                                className="flex-1 resize-none rounded-lg border border-border px-3 py-1 text-sm bg-white dark:bg-black text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-orange transition min-h-[32px] max-h-[80px]"
+                                rows={1}
                                 placeholder="Type a message..."
                                 value={messageText}
                                 onChange={(e) => setMessageText(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                className="flex-1 rounded-xl px-4 py-2 text-sm bg-white dark:bg-black text-black dark:text-white border border-black dark:border-white placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent dark:focus:border-transparent"
-                                autoFocus
+                                style={{ minHeight: '32px', maxHeight: '80px' }}
                             />
                             <button
                                 className="p-2 rounded-full bg-brand-orange text-white hover:bg-orange-600 transition disabled:opacity-50"
-                                onClick={() => handleSendMessage({ messageText, selectedUser, loggedUserId, setMessageText, setError })}
+                                onClick={() => handleSendMessage({ messageText, selectedUser, loggedUserId, setMessageText, setError: () => { } })}
                                 disabled={!messageText.trim()}
                             >
                                 <Send className="w-5 h-5" />
@@ -233,6 +374,7 @@ const Chats = () => {
                     </div>
                 </div>
             )}
+            <ImageModal open={imageModal.open} url={imageModal.url} name={imageModal.name} onClose={() => setImageModal({ open: false, url: '', name: '' })} />
         </div>
     );
 };

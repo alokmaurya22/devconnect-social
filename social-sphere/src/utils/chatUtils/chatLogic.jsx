@@ -1,5 +1,5 @@
 // src/logic/chatLogic.jsx
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { fetchChatUsers } from './userFetch';
@@ -96,8 +96,8 @@ export const useChatLogic = ({ chatUserID, loggedUserId, chatUsers, setChatUsers
         messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [setMessages]);
 
-    // Close emoji picker on outside click
-    const handleOutsideClick = (emojiRef, setShowEmojiPicker) => {
+    // Custom hook for outside click
+    const useOutsideClick = (emojiRef, setShowEmojiPicker) => {
         useEffect(() => {
             const handler = (e) => {
                 if (emojiRef.current && !emojiRef.current.contains(e.target)) {
@@ -106,7 +106,7 @@ export const useChatLogic = ({ chatUserID, loggedUserId, chatUsers, setChatUsers
             };
             document.addEventListener('mousedown', handler);
             return () => document.removeEventListener('mousedown', handler);
-        }, []);
+        }, [emojiRef, setShowEmojiPicker]);
     };
 
     // Send message
@@ -115,20 +115,29 @@ export const useChatLogic = ({ chatUserID, loggedUserId, chatUsers, setChatUsers
         selectedUser,
         loggedUserId,
         setMessageText,
-        setError
+        setError,
+        fileURL,
+        fileType,
+        fileName
     }) => {
         if (!messageText.trim() || !selectedUser || !loggedUserId) return;
         try {
             const currentUserDoc = await getDoc(doc(db, 'users', loggedUserId));
             const currentUserData = currentUserDoc.data();
 
+            // Construct message object with file fields if present
+            const messageObj = {
+                text: messageText,
+                senderId: loggedUserId,
+                receiverId: selectedUser.id
+            };
+            if (fileURL) messageObj.fileURL = fileURL;
+            if (fileType) messageObj.fileType = fileType;
+            if (fileName) messageObj.fileName = fileName;
+
             await sendMessage(
                 getChatId(loggedUserId, selectedUser.id),
-                {
-                    text: messageText,
-                    senderId: loggedUserId,
-                    receiverId: selectedUser.id
-                },
+                messageObj,
                 {
                     name: currentUserData?.fullName || 'You',
                     dp: currentUserData?.dp || ''
@@ -148,6 +157,6 @@ export const useChatLogic = ({ chatUserID, loggedUserId, chatUsers, setChatUsers
 
     return {
         handleSendMessage,
-        handleOutsideClick
+        useOutsideClick
     };
 };
