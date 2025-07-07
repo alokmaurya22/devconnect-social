@@ -6,6 +6,8 @@ import { useChatLogic } from '../utils/chatUtils/chatLogic';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../configuration/firebaseConfig";
 import compressImage from '../utils/imageCompressor';
+import { updateDoc, doc } from 'firebase/firestore';
+import { db } from '../configuration/firebaseConfig';
 
 const Chats = () => {
     const [messageText, setMessageText] = useState('');
@@ -145,6 +147,25 @@ const Chats = () => {
         );
     };
 
+    // Mark messages as read when viewing a chat
+    useEffect(() => {
+        const markMessagesAsRead = async () => {
+            if (!selectedUser || !loggedUserId || messages.length === 0) return;
+            const unreadMessages = messages.filter(
+                (msg) => msg.receiverId === loggedUserId && msg.status !== 'read'
+            );
+            if (unreadMessages.length === 0) return;
+            const chatId = [loggedUserId, selectedUser.id].sort().join('_');
+            const updates = unreadMessages.map(async (msg) => {
+                const msgRef = doc(db, 'chats', chatId, 'messages', msg.id);
+                await updateDoc(msgRef, { status: 'read' });
+            });
+            await Promise.all(updates);
+        };
+        markMessagesAsRead();
+        // Only run when selectedUser or messages change
+    }, [selectedUser, messages, loggedUserId]);
+
     return (
         <div className="flex h-[calc(100vh-5rem)] md:h-[calc(100vh-5.6rem)] w-full bg-background text-foreground mt-9 relative">
             {/* Sidebar */}
@@ -229,39 +250,67 @@ const Chats = () => {
                             const prevMsg = messages[idx - 1];
                             const showAvatar = !isSent && (!prevMsg || prevMsg.senderId !== msg.senderId);
                             return (
-                                <div key={msg.id} className={`flex ${isSent ? "justify-end" : "justify-start"} group transition-all duration-200`}>
+                                <div
+                                    key={msg.id}
+                                    className={`flex ${isSent ? "justify-end" : "justify-start"} group transition-all duration-200`}
+                                >
                                     {!isSent && showAvatar && (
                                         <img
                                             src={selectedUser.dp}
                                             alt={selectedUser.name}
-                                            className="w-7 h-7 rounded-full object-cover mr-2 self-end mb-1"
+                                            className="w-7 h-7 rounded-full object-cover mr-2 self-end mb-1 shadow-md border border-gray-200 dark:border-gray-700"
                                         />
                                     )}
-                                    <div className={`max-w-[75%] rounded-xl px-4 py-1 text-sm md:text-base relative ${isSent ? "bg-brand-orange text-white" : "bg-blue-600 text-white"} shadow-sm transition-all duration-200`}>
+                                    <div
+                                        className={`relative max-w-[75%] px-4 py-1 rounded-xl text-base shadow-md transition-all duration-200
+                                            ${isSent
+                                                ? "bg-gradient-to-br from-orange-400 via-brand-orange to-orange-600 text-white"
+                                                : "bg-white dark:bg-dark-card text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700"}
+                                            group-hover:scale-[1.01] group-hover:shadow-lg
+                                        `}
+                                        style={{ wordBreak: 'break-word' }}
+                                    >
+                                        {/* File/Image Message */}
                                         {msg.fileURL ? (
                                             msg.fileType && msg.fileType.startsWith('image') ? (
                                                 <button
-                                                    className="inline-flex items-center gap-2 px-4 py-1 rounded-lg bg-gradient-to-r from-orange-400 to-blue-500 text-white font-semibold shadow hover:from-orange-500 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-orange-300 transition mb-1"
+                                                    className="block w-full max-w-[180px] rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 mb-1 focus:outline-none focus:ring-2 focus:ring-orange-300 transition relative group/image"
                                                     onClick={e => { e.preventDefault(); setImageModal({ open: true, url: msg.fileURL, name: msg.fileName || 'Image' }); }}
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5V6.75A2.25 2.25 0 015.25 4.5h13.5A2.25 2.25 0 0121 6.75v10.5m-18 0A2.25 2.25 0 005.25 19.5h13.5A2.25 2.25 0 0021 16.5m-18 0v-1.372a2.25 2.25 0 01.563-1.504l3.75-4.286a2.25 2.25 0 013.374 0l1.25 1.429m0 0l.75-.857a2.25 2.25 0 013.374 0l3.75 4.286a2.25 2.25 0 01.563 1.504V16.5m-9-5.25h.008v.008H12v-.008z" /></svg>
-                                                    View Image
+                                                    <img
+                                                        src={msg.fileURL}
+                                                        alt={msg.fileName || 'Image'}
+                                                        className="w-full h-[110px] object-cover rounded-lg group-hover/image:brightness-95 transition"
+                                                    />
+                                                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-brand-orange text-white text-[10px] px-2 rounded-xl shadow-md font-medium opacity-95 group-hover/image:scale-105 group-hover/image:bg-orange-700 transition-all border border-white">
+                                                        View
+                                                    </span>
                                                 </button>
                                             ) : (
-                                                <a href={msg.fileURL} target="_blank" rel="noopener noreferrer" className="underline break-all block mb-1">{msg.fileName || 'Download file'}</a>
+                                                <a
+                                                    href={msg.fileURL}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="underline break-all block mb-1 text-blue-600 dark:text-blue-400 hover:text-blue-800"
+                                                >
+                                                    {msg.fileName || 'Download file'}
+                                                </a>
                                             )
                                         ) : (
-                                            <p>{msg.text}</p>
+                                            <span className="whitespace-pre-line leading-relaxed">{msg.text}</span>
                                         )}
-                                        <div className="flex items-center justify-between mt-1">
-                                            <span className={`text-xs ${isSent ? "text-orange-100" : "text-blue-100"}`}>{formatDateTime(msg.createdAt)}</span>
+                                        {/* Timestamp and Status */}
+                                        <div className="flex items-center gap-1 mt-0">
+                                            <span className={`text-xs ${isSent ? "text-orange-100" : "text-gray-500 dark:text-gray-400"}`}>{formatDateTime(msg.createdAt)}</span>
                                             {isSent && (
-                                                <span className="ml-2">
-                                                    {msg.status === 'read' ? '✓✓' : '✓'}
+                                                <span className="ml-1 flex items-center">
+                                                    {msg.status === 'read' ? (
+                                                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" className="inline-block"><path d="M7.5 13.5L4 10L5.41 8.59L7.5 10.67L14.59 3.59L16 5L7.5 13.5Z" fill="#38bdf8" /><path d="M11.5 13.5L8 10L9.41 8.59L11.5 10.67L18.59 3.59L20 5L11.5 13.5Z" fill="#38bdf8" /></svg>
+                                                    ) : (
+                                                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" className="inline-block"><path d="M7.5 13.5L4 10L5.41 8.59L7.5 10.67L14.59 3.59L16 5L7.5 13.5Z" fill="#cbd5e1" /></svg>
+                                                    )}
                                                 </span>
                                             )}
-                                            {/* Placeholder for reactions */}
-                                            <span className="ml-2 opacity-0 group-hover:opacity-100 transition cursor-pointer">😊</span>
                                         </div>
                                     </div>
                                 </div>
