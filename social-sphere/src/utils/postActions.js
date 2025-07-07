@@ -1,4 +1,4 @@
-import { doc, collection, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, getDocs, query, where, addDoc, orderBy, limit, startAfter, deleteDoc } from "firebase/firestore";
+import { doc, collection, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, getDocs, query, addDoc, orderBy, limit, startAfter, deleteDoc } from "firebase/firestore";
 import { db } from "../configuration/firebaseConfig";
 
 export const toggleLike = async (postId, userId) => {
@@ -131,4 +131,16 @@ export const getUsersByAction = async (postId, actionType) => {
     const snapshot = await getDocs(subColRef);
     const users = snapshot.docs.map((doc) => doc.data().userId);
     return users;
+};
+
+// Save a post for a user (creates a savedPosts subcollection under user)
+export const savePostForUser = async (userId, postId, postData = {}) => {
+    const savedRef = doc(collection(db, "users", userId, "savedPosts"), postId);
+    await setDoc(savedRef, { postId, ...postData, savedAt: new Date() });
+};
+
+// Unsave a post for a user
+export const unsavePostForUser = async (userId, postId) => {
+    const savedRef = doc(collection(db, "users", userId, "savedPosts"), postId);
+    await deleteDoc(savedRef);
 };

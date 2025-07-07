@@ -12,6 +12,7 @@ import Explore from "../pages/Explore";
 import Notifications from "../pages/Notifications";
 import Bookmarks from "../pages/Bookmarks";
 import RightSidebar from "../components/homePageComponents/RightSidebar";
+import Post from "../pages/Post";
 
 const AppRoutes = () => {
     const allowedRoutes = ["/login", "/signup", "/"]; // 👈 guest can access
@@ -22,6 +23,7 @@ const AppRoutes = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/post/:postId" element={<Post />} />
 
             {/* Protected routes access after login */}
             <Route path="/home" element={<ProtectedRoute element={<Home />} allowedRoutes={allowedRoutes} />} />
