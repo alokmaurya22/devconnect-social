@@ -4,6 +4,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../utils/authFunctions";
+import { loginWithGoogle } from "../utils/authFunctions";
 import { useGuestTimer } from "../context/GuestTimerContext";
 
 const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
@@ -41,6 +42,22 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
             },
             (errorMessage) => {
                 setMessage("❌ Something went wrong!");
+                console.log(errorMessage);
+                setTimeout(() => setMessage(""), 4000);
+            }
+        );
+    };
+
+    const handleGoogleLogin = () => {
+        loginWithGoogle(
+            () => {
+                onLoginSuccess();
+                setMessage("Logged in with Google!");
+                handleClose();
+                setTimeout(() => setMessage(""), 3000);
+            },
+            (error) => {
+                setMessage("❌ Google login failed: " + error);
                 setTimeout(() => setMessage(""), 4000);
             }
         );
@@ -108,6 +125,7 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
                             <button
                                 type="button"
                                 className="flex items-center gap-3 px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-light-card dark:bg-[#0c0c0c] hover:border-brand-orange hover:bg-white dark:hover:bg-[#1a1a1a] transition w-full justify-center"
+                                onClick={handleGoogleLogin}
                             >
                                 <FcGoogle className="text-xl" />
                                 <span className="text-sm font-medium text-black dark:text-white">

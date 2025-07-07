@@ -4,6 +4,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useGuestTimer } from "../context/GuestTimerContext";
 import { loginUser } from "../utils/authFunctions";
+import { loginWithGoogle } from "../utils/authFunctions";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -41,6 +42,20 @@ const Login = () => {
                 console.error("Login error:", errorMessage);
                 setMessage("❌ Something went wrong!");
                 //alert("Login failed: " + errorMessage);
+            }
+        );
+    };
+
+    const handleGoogleLogin = () => {
+        loginWithGoogle(
+            () => {
+                setIsAuthenticated(true);
+                setShowTimer(false);
+                setMessage("Logged in with Google!");
+                navigate("/home");
+            },
+            (errorMessage) => {
+                setMessage("❌ Google login failed: " + errorMessage);
             }
         );
     };
@@ -94,6 +109,7 @@ const Login = () => {
                         <button
                             type="button"
                             className="flex items-center gap-3 px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-light-card dark:bg-[#0c0c0c] hover:border-brand-orange hover:bg-white dark:hover:bg-[#1a1a1a] transition w-full justify-center"
+                            onClick={handleGoogleLogin}
                         >
                             <FcGoogle className="text-xl" />
                             <span className="text-sm font-medium text-black dark:text-white">

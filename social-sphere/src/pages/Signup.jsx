@@ -4,6 +4,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useGuestTimer } from "../context/GuestTimerContext";
 import { signUpUser } from "../utils/authFunctions";
+import { loginWithGoogle } from "../utils/authFunctions";
 
 const SignUp = () => {
     const navigate = useNavigate();
@@ -20,12 +21,10 @@ const SignUp = () => {
     });
 
     const [errorMessage, setErrorMessage] = useState('');
-    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false); // 👁️
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         signUpUser(
             formData,
@@ -40,13 +39,24 @@ const SignUp = () => {
                 setErrorMessage("Signup failed. Please try again");
             }
         );
-
-        setLoading(false);
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleGoogleSignup = () => {
+        loginWithGoogle(
+            () => {
+                setIsAuthenticated(true);
+                setShowTimer(false);
+                navigate("/home");
+            },
+            (errorMessage) => {
+                setErrorMessage("❌ Google signup failed: " + errorMessage);
+            }
+        );
     };
 
     return (
@@ -117,6 +127,7 @@ const SignUp = () => {
                         <button
                             type="button"
                             className="flex items-center gap-3 px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-light-card dark:bg-[#0c0c0c] hover:border-brand-orange hover:bg-white dark:hover:bg-[#1a1a1a] transition w-full justify-center"
+                            onClick={handleGoogleSignup}
                         >
                             <FcGoogle className="text-xl" />
                             <span className="text-sm font-medium text-black dark:text-white">
