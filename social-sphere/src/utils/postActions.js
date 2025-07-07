@@ -65,7 +65,7 @@ export const fetchComments = async (postId, lastCommentDoc = null) => {
     let q = query(
         collection(db, "posts", postId, "comments"),
         orderBy("timestamp", "desc"),
-        limit(5)
+        limit(2)
     );
 
     if (lastCommentDoc) {

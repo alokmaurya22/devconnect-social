@@ -1,11 +1,41 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FaHeart, FaRegComment, FaShare, FaBookmark, FaUserCircle } from "react-icons/fa";
 import PostActions from "./PostActions";
-// import { useNavigate } from "react-router-dom";
+import Comments from "./Comments";
+import { followUser, checkIfFollowing } from "../utils/followUtils";
+import { useNavigate } from "react-router-dom";
 
 const PostCard = ({ post }) => {
-    // const navigate = useNavigate();
-    // const userId = sessionStorage.getItem("userID");
+    const [showComments, setShowComments] = useState(false);
+    const [showFollow, setShowFollow] = useState(false);
+    const [followLoading, setFollowLoading] = useState(false);
+    const userId = sessionStorage.getItem("userID");
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        let ignore = false;
+        const checkFollow = async () => {
+            if (!userId || !post.userId || userId === post.userId) {
+                setShowFollow(false);
+                return;
+            }
+            const isFollowing = await checkIfFollowing(userId, post.userId);
+            if (!ignore) setShowFollow(!isFollowing);
+        };
+        checkFollow();
+        return () => { ignore = true; };
+    }, [userId, post.userId]);
+
+    const handleFollow = async () => {
+        setFollowLoading(true);
+        await followUser(userId, post.userId);
+        setShowFollow(false);
+        setFollowLoading(false);
+    };
+
+    const goToUserProfile = () => {
+        if (post.userId) navigate(`/user/${post.userId}`);
+    };
 
     const postTime = post.createdAt?.toDate
         ? timeAgo(post.createdAt.toDate())
@@ -20,17 +50,27 @@ const PostCard = ({ post }) => {
                         <img
                             src={post.profileDP}
                             alt="User DP"
-                            className="w-8 h-8 rounded-full object-cover"
+                            className="w-8 h-8 rounded-full object-cover cursor-pointer"
+                            onClick={goToUserProfile}
                         />
                     ) : (
-                        <FaUserCircle className="text-2xl text-gray-500 dark:text-gray-300" />
+                        <FaUserCircle className="text-2xl text-gray-500 dark:text-gray-300 cursor-pointer" onClick={goToUserProfile} />
                     )}
-                    <h3 className="font-semibold text-brand-orange cursor-pointer">
-                        {post.fullName}
-                        <span className="block text-blue-900 dark:text-blue-400 text-xs mt-0">
-                            @{post.username}
-                        </span>
-                    </h3>
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                            <span className="font-semibold text-brand-orange text-lg cursor-pointer" onClick={goToUserProfile}>{post.fullName}</span>
+                            {showFollow && (
+                                <button
+                                    className="px-1 py-0 text-sm font-medium bg-green-500 hover:bg-green-600 text-black rounded shadow focus:outline-none focus:ring-2 focus:ring-green-400 transition disabled:opacity-60"
+                                    onClick={handleFollow}
+                                    disabled={followLoading}
+                                >
+                                    {followLoading ? "Following..." : "Follow"}
+                                </button>
+                            )}
+                        </div>
+                        <span className="block text-blue-900 dark:text-blue-400 text-sm mt-0 cursor-pointer" onClick={goToUserProfile}>@{post.username}</span>
+                    </div>
                 </div>
                 <span className="text-sm text-gray-500 dark:text-gray-400">{postTime}</span>
             </div>
@@ -59,7 +99,8 @@ const PostCard = ({ post }) => {
             )}
 
             {/* Action Buttons */}
-            <PostActions post={post} />
+            <PostActions post={post} onCommentClick={() => setShowComments((v) => !v)} />
+            {showComments && <Comments postId={post.id} showInput={true} />}
         </div>
     );
 };

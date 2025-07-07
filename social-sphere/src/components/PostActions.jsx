@@ -5,7 +5,7 @@ import { logShare, savePostForUser, unsavePostForUser } from "../utils/postActio
 import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../configuration/firebaseConfig";
 
-const PostActions = ({ post }) => {
+const PostActions = ({ post, onCommentClick }) => {
     const navigate = useNavigate();
     const [saved, setSaved] = useState(false);
     const [liked, setLiked] = useState(false);
@@ -93,7 +93,7 @@ const PostActions = ({ post }) => {
                     <FaHeart className="text-base" />
                     <span>Like</span>
                 </button>
-                <button className="flex items-center gap-1 hover:text-blue-500 transition">
+                <button className="flex items-center gap-1 hover:text-blue-500 transition" onClick={onCommentClick}>
                     <FaRegComment className="text-base" />
                     <span>Comment</span>
                 </button>
