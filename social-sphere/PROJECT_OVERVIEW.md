@@ -1,102 +1,200 @@
 # 🌐 Social Sphere
 
-**Social Sphere** is a modern, full-stack web-based social media platform designed to foster meaningful connections through real-time chat, user-generated content, and a clean, responsive interface. Built with a focus on seamless user experience, the app supports both guest and registered sessions, profile customization, and dynamic interactions.
+[Live Preview](https://social-sphere-self.vercel.app/)
+
+**Social Sphere** is a modern, full-stack, web-based social media platform that fosters meaningful connections through real-time chat, user-generated content, and a responsive, intuitive UI. Whether you're a guest exploring the app or a registered user diving fully into the experience, Social Sphere puts **community** and **usability** first.
 
 ---
 
 ## 🚀 Features
 
-- **Create Posts**: Share your thoughts, media (images/videos), and ideas with others. Posts can be public, friends-only, private, or saved as drafts. Tag users and upload compressed media for efficiency.
-- **Feed with Tabs**: Browse a personalized feed with "For You" (public posts) and "Following" (posts from users you follow). Infinite scroll and real-time updates.
-- **Post Interactions**: Like, comment, share (including to chat), and bookmark posts. Comments support threaded replies and are loaded dynamically.
-- **Real-Time Chat**: One-on-one messaging with emoji support, file/image sharing, read receipts, and timestamps. Chat sidebar lists all conversations, sorted by recent activity.
-- **User Profiles**: Fully editable profiles with display picture, bio, location, website, interests, and username. View your own or other users' profiles.
-- **Followers & Following**: View lists of followers and followings, with quick actions to view profiles or start chats. Follow/unfollow users directly from their profile or posts.
-- **Guest Sessions**: Try the app as a guest with a 5-minute session timer. A visible countdown and modal prompt encourage registration or login before time expires.
-- **Authentication**: Secure login/signup with email/password or Google. Firebase Authentication ensures safe session handling.
-- **Bookmarks**: Save posts for later viewing. Bookmarked posts are listed with infinite scroll and user/post details.
-- **Search**: Instantly find users by name or username with intelligent suggestions and quick navigation to profiles.
-- **Theme Toggle**: Switch between dark and light modes at any time. Theme preference is saved locally.
-- **Responsive UI**: Optimized for desktops, tablets, and mobile devices. Mobile-specific layouts and controls.
-- **Smooth Routing**: Seamless navigation with React Router, including protected routes for authenticated features.
-- **Notifications**: (Planned) Placeholder for future notification system.
-- **Active Development Notice**: Users are informed that the app is in active development, with a feedback link for suggestions.
+- **📝 Create Posts** – Share thoughts, media (images/videos), tag users, and control post visibility (public, friends-only, private, or drafts).
+- **📰 Feed Tabs** – Personalized feed with "For You" and "Following". Includes infinite scroll and real-time updates.
+- **❤️ Post Interactions** – Like, comment, share (to chat), and bookmark posts. Threaded comment replies supported.
+- **💬 Real-Time Chat** – One-on-one DM style messaging with emoji support, media/files, timestamps, and read receipts.
+- **👤 User Profiles** – Update profile with picture, bio, website, location, and more. View other users' content and follow them.
+- **👣 Followers System** – Follow/unfollow directly from posts or profile. View and manage Following/Followers.
+- **🧪 Guest Sessions** – Explore with limited access for 5 minutes. Registration prompt shown after timeout.
+- **🔐 Authentication** – Secure login/signup using Firebase Authentication with email/password or Google.
+- **🔖 Bookmarks** – Save posts to revisit later. Fully searchable and scrollable.
+- **🔎 Global Search** – Search by username or name; see smart suggestions.
+- **🌓 Theme Toggle** – Switch between dark/light modes — saved locally per user.
+- **📱 Responsive UI** – Adapted layouts for mobile, tablet, and desktop.
+- **🔀 Routing** – Protected and dynamic routes powered by React Router.
+- **🔔 Notifications** _(Coming Soon)_
 
 ---
 
 ## 🧱 Tech Stack
 
-- **Frontend**: React.js, Tailwind CSS, React Router, Emoji Picker, Toastify, Lucide React, React Icons
-- **Backend/Services**: Firebase Authentication, Firestore (Database), Firebase Storage
-- **Utilities**: Image compression, Infinite scroll, Context API for theme and guest session management
-- **Build Tools**: Vite, ESLint, Prettier
+**Frontend**
+
+- React.js
+- Tailwind CSS
+- Vite
+- React Router
+- Emoji Picker
+- Toastify
+- Lucide React
+- React Icons
+
+**Backend / Services**
+
+- Firebase Authentication
+- Firestore (NoSQL Database)
+- Firebase Storage
+
+**Utilities**
+
+- Image Compression
+- Infinite Scroll
+- Context API
 
 ---
 
-## 🗺️ Main Pages & Flows
+## 🗺️ Main Pages & User Flows
 
-- **Home**: Central feed with tabs, post creation modal, and sidebars for navigation and suggestions.
-- **Explore**: (Planned) Discover new users and trending content.
-- **Bookmarks**: View and manage saved posts.
-- **Chats**: Real-time messaging with file/image sharing and emoji support.
-- **Profile**: Edit your profile, view your posts, and manage followers/followings.
-- **User Profile**: View other users' profiles, follow/unfollow, and see their public/friends-only posts.
-- **Post**: View a single post with all interactions and comments.
-- **Login/Signup**: Secure authentication with email/password or Google. Guest session timer is paused on these pages.
-- **Followers/Following Modal/Page**: See lists of followers and followings, with quick actions.
+- **Home** – Feed, Post creator, trends/groups sidebars
+- **Explore** _(Planned)_ – Trending tags and user discovery
+- **Bookmarks** – Saved posts archive
+- **Chats** – Real-time conversation dashboard
+- **Own Profile** – View/edit personal profile & posts
+- **Other Users' Profiles** – Follow and chat options
+- **Post Detail View** – Interact with full post/comments
+- **Auth (Login/Signup)** – Auth pages, with guest timer pause
+- **Followers Modal** – Manage followers & followings easily
 
 ---
 
 ## 🧑‍💻 How It Works
 
-1. **Guest Access**: New users can browse as a guest for 5 minutes. A timer is shown, and a modal prompts login/signup when time expires.
-2. **Registration/Login**: Users can sign up or log in with email/password or Google. Authenticated users have full access.
-3. **Creating & Interacting with Posts**: Authenticated users can create, edit, delete, like, comment, share, and bookmark posts. Media uploads are compressed for speed.
-4. **Chat**: Start conversations from user profiles or the chat sidebar. Send text, emojis, images, and files. Messages are timestamped and support read receipts.
-5. **Profile Management**: Edit your profile, upload a display picture, and manage your posts. View and manage followers/followings.
-6. **Search**: Use the search bar to find users by name or username. Suggestions update in real time.
-7. **Theme Switching**: Toggle between dark and light modes. The app remembers your preference.
+1. **⛔ Guest Access**  
+   Non-registered users can browse for 5 minutes. Banner/timer reminds them to log in or sign up.
+
+2. **✅ Authentication**  
+   Users create accounts via email/password or Google OAuth, with secure Firebase-backed session handling.
+
+3. **📨 Post & Chat**  
+   Share content or message real-time with emojis, images, and files. User-friendly interactions like liking, commenting or sharing available.
+
+4. **🪪 Profile Control**  
+   Customize avatar, bio, website, interests, and more. View and follow others too.
+
+5. **🔍 Discover People**  
+   Smart search to instantly find users from their name or handle.
+
+6. **💡 Theme Switching**  
+   Toggle between themes across sessions and devices.
 
 ---
 
 ## 🛠️ Setup & Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repo-url>
-   cd DEV_CONNECT/social-sphere
-   ```
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-3. **Configure Firebase:**
-   - Add your Firebase config to `src/configuration/firebaseConfig.js`.
-   - Ensure Firestore, Authentication, and Storage are enabled in your Firebase project.
-4. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
-5. **Build for production:**
-   ```bash
-   npm run build
-   ```
+> Pre-requisites: Node.js, Firebase Project setup
+
+```bash
+# Clone the repository
+git clone https://github.com/alokmaurya22/SocialSphere.git
+cd DEV_CONNECT/social-sphere
+
+# Install project dependencies
+npm install
+
+# Firebase Setup: Open src/configuration/firebaseConfig.js,
+# and add your Firebase config values – ensure:
+# 🔹 Authentication 🔹 Firestore 🔹 Storage are enabled
+
+# Start development server
+npm run dev
+
+# For production build
+npm run build
+
+```
+
+# 🤝 Contribution & Feedback
+
+Thank you for considering contributing to **Social Sphere**!  
+We're building 🚧 this platform actively, and your input **matters a lot**.
 
 ---
 
-## 🤝 Contribution & Feedback
+## 🗣 Send Us Your Feedback
 
-- This project is in active development. Feedback and contributions are welcome!
-- Please use the [feedback form](https://forms.gle/pmYdvckr1QGJYGMo9) or open an issue on GitHub.
+Have suggestions, request features, or spot room for improvement?
+
+👉 [Send feedback through the app](https://social-sphere-self.vercel.app/)
 
 ---
 
-## 📸 Screenshots
+## 🐛 Found a Bug?
 
-> _Add screenshots or GIFs here to showcase the UI and features._
+Please help us improve the platform by reporting bugs.  
+You can open a GitHub issue:
+
+🔗 [Open an Issue](https://github.com/alokmaurya22/SocialSphere/issues)
+
+Use one of the issue templates to:
+
+- Report a bug 🐞
+- Request a feature ✨
+- Ask a question ❓
+
+---
+
+## ⭐ Support the Project
+
+If you like **Social Sphere** or find it useful, please consider giving a star:
+
+🌟 [Star this repo on GitHub](https://github.com/alokmaurya22/SocialSphere)
+
+Your support helps keep the project going and visible to others 🚀
 
 ---
 
 ## 📄 License
 
-_Include your license information here if applicable._
+You are free to use, copy, modify, merge, publish, it under the terms of the license.
+But can't use for monitory purposes. It cant be sell to anyone. If you want please connect to developer. [Gmail ](er.alokmaurya22@gmail.com)
+
+---
+
+## 🔗 Developer Info
+
+Built and maintained with 💻 by [Alok Maurya](https://github.com/alokmaurya22)
+
+- 🌐 [Portfolio Website](http://alokdata.netlify.app/)
+- 💼 [LinkedIn](https://www.linkedin.com/in/alokmaurya22/)
+- 💻 [GitHub](https://github.com/alokmaurya22)
+
+---
+
+> _"A profile picture speaks before you do." – Social Sphere Team_
+
+## Screenshots
+
+Below are screenshots of the Social Sphere app:
+
+<img src="./src/assets/screenshots/browse_desktop.png" alt="Browse Page on Desktop" width="400"/>
+_Browse Page on Desktop_
+
+![Browse Page Mobile](./src/assets/screenshots/browse_mobile.png)
+_Browse Page on Mobile_
+
+![Chat Page Desktop](./src/assets/screenshots/chat_desktop.png)
+_Chat Page on Desktop_
+
+![Chat Page Mobile](./src/assets/screenshots/chat_mobile.png)
+_Chat Page on Mobile_
+
+![Create Post Desktop](./src/assets/screenshots/createPost_DESKTOP.png)
+_Create Post Modal on Desktop_
+
+![Create Post Mobile](./src/assets/screenshots/createPost_mobile.png)
+_Create Post Modal on Mobile_
+
+![Profile Page Desktop](./src/assets/screenshots/profile_desktop.png)
+_Profile Page on Desktop_
+
+![Profile Page Mobile](./src/assets/screenshots/profile_mobile.png)
+_Profile Page on Mobile_
