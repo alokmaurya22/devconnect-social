@@ -166,6 +166,13 @@ const Chats = () => {
         // Only run when selectedUser or messages change
     }, [selectedUser, messages, loggedUserId]);
 
+    // Auto-scroll to bottom when messages or selectedUser change
+    useEffect(() => {
+        if (messageEndRef.current) {
+            messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages, selectedUser]);
+
     return (
         <div className="flex h-[calc(100vh-5rem)] md:h-[calc(100vh-5.6rem)] w-full bg-background text-foreground mt-9 relative">
             {/* Sidebar */}
