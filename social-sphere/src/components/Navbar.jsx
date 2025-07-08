@@ -76,7 +76,7 @@ const Navbar = () => {
                     <img
                         src={logo}
                         alt="Logo"
-                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
+                        className="w-7 h-7 sm:w-10 sm:h-10 rounded-full object-cover"
                     />
                 </Link>
 
