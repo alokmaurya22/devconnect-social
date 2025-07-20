@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { SidebarItem } from "./ImportantComponents";
 import { useGuestTimer } from "../../context/GuestTimerContext";
 import UploadDummyPosts from "../UploadDummyPosts";
+import AIChat from "../AI_chat";
 
 
 const LeftSidebar = ({ onPostClick }) => {
@@ -45,6 +46,9 @@ const LeftSidebar = ({ onPostClick }) => {
             </Link>
             <Link to="/profile">
                 <SidebarItem icon={<FaUser />} label="Profile" />
+            </Link>
+            <Link to="/ai-chat">
+                <SidebarItem icon={<AIChat />} label="Soli - AI assistent" />
             </Link>
             {/* 
             <Link to="/more">

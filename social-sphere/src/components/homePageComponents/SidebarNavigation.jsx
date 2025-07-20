@@ -7,9 +7,10 @@ import {
     FaBookmark,
     FaUser,
     FaSignOutAlt,
+    FaRobot
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { SidebarItem } from "./ImportantComponents"; // adjust path as needed
+import { SidebarItem } from "./ImportantComponents";
 
 const navItems = [
     { path: "/home", label: "Home", icon: <FaHome /> },
@@ -18,6 +19,7 @@ const navItems = [
     { path: "/chats", label: "Messages", icon: <FaEnvelope /> },
     { path: "/bookmarks", label: "Bookmarks", icon: <FaBookmark /> },
     { path: "/profile", label: "Profile", icon: <FaUser /> },
+    { path: "/ai-chat", label: "Soli - AI", icon: <FaRobot /> },
 ];
 const SidebarNavigation = ({ onClick, itemClass = "", wrapperClass = "" }) => {
     return (

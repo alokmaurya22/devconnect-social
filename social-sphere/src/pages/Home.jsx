@@ -4,11 +4,17 @@ import LeftSidebarDesign from "../components/homePageComponents/LeftSidebarDesig
 import MainFeed from "../components/homePageComponents/MainFeed";
 import CreatePostModel from "./CreatePostModel";
 import { useGuestTimer } from "../context/GuestTimerContext";
+import { useLocation, useNavigate } from "react-router-dom";
+import AIChatModal from "./AI_chat";
 
 const Home = () => {
     const [showModal, setShowModal] = useState(false);
     const [showNotice, setShowNotice] = useState(true);
     const { setShowTimer, isAuthenticated } = useGuestTimer();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const isAIChatOpen = location.pathname === "/ai-chat";
+    const handleCloseAIChat = () => navigate(-1);
 
     useEffect(() => {
         setShowTimer(!isAuthenticated);
@@ -88,6 +94,9 @@ const Home = () => {
 
             {/* ===================== CREATE POST MODAL ====================== */}
             {showModal && <CreatePostModel onClose={handleCloseModal} />}
+            {isAIChatOpen && (
+                <AIChatModal open={true} onClose={handleCloseAIChat} />
+            )}
         </>
     );
 };

@@ -9,7 +9,10 @@ export const GuestTimerProvider = ({ children }) => {
 
     const guestTimerDuration = 300; // guest timer duration
     const [secondsLeft, setSecondsLeft] = useState(guestTimerDuration);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // Initialize isAuthenticated based on sessionStorage
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        return !!sessionStorage.getItem("userID");
+    });
     const [showTimer, setShowTimer] = useState(true);
     const [showLoginPopup, setShowLoginPopup] = useState(false);
     const [userId, setUserId] = useState(null);
@@ -17,6 +20,16 @@ export const GuestTimerProvider = ({ children }) => {
     const isAuthPage = ["/login", "/signup"].includes(location.pathname);
 
     const [timerActive, setTimerActive] = useState(true);
+
+    // On mount, check sessionStorage for userID to persist login across refreshes
+    useEffect(() => {
+        const userID = sessionStorage.getItem("userID");
+        if (userID) {
+            setIsAuthenticated(true);
+        } else {
+            setIsAuthenticated(false);
+        }
+    }, []);
 
     //  Pause timer on /login and /signup
     useEffect(() => {

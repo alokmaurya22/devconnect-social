@@ -13,6 +13,8 @@ import Notifications from "../pages/Notifications";
 import Bookmarks from "../pages/Bookmarks";
 import RightSidebar from "../components/homePageComponents/RightSidebar";
 import Post from "../pages/Post";
+import AIChatPage from "../pages/AI_chat";
+
 
 const AppRoutes = () => {
     const allowedRoutes = ["/login", "/signup", "/"]; // 👈 guest can access
@@ -20,11 +22,12 @@ const AppRoutes = () => {
     return (
         <Routes>
             {/* Public routes */}
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home />}>
+                <Route path="ai-chat" element={null} />
+            </Route>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/post/:postId" element={<Post />} />
-
             {/* Protected routes access after login */}
             <Route path="/home" element={<ProtectedRoute element={<Home />} allowedRoutes={allowedRoutes} />} />
             <Route path="/editpost/:postId" element={<ProtectedRoute element={<EditPost />} allowedRoutes={allowedRoutes} />} />
