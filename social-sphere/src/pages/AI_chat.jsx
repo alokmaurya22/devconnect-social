@@ -4,9 +4,7 @@ import { getGeminiResponse } from '../utils/geminiApi';
 import logo from "../assets/logo_new.png";
 const conversationStarters = [
     "How can I improve my productivity?",
-    "Give me some motivation for today",
     "Help me plan my week",
-    "What's a good way to manage stress?"
 ];
 
 const AIChatModal = ({ open, onClose }) => {
@@ -88,19 +86,19 @@ const AIChatModal = ({ open, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div ref={modalRef} className="relative w-full max-w-2xl mx-auto bg-light-bg dark:bg-dark-bg text-text-light dark:text-text-dark rounded-xl shadow-2xl border-4 border-brand-orange mt-3" style={{ borderColor: '#ff6600' }}>
+            <div ref={modalRef} className="relative w-[85%] sm:w-full max-w-2xl mx-auto bg-light-bg dark:bg-dark-bg text-text-light dark:text-text-dark rounded-xl shadow-2xl border-4 border-brand-orange mb-6" style={{ borderColor: '#ff6600' }}>
                 {/* Close Icon */}
                 <button
                     onClick={onClose}
                     className="absolute top-1 right-3 z-10 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-orange-500 transition-colors"
                     aria-label="Close"
                 >
-                    <X className="w-6 h-6" />
+                    <X className="w-6 h-6 text-red-500" />
                 </button>
                 {/* Header */}
-                <div className="bg-white dark:bg-dark-card rounded-t-xl p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-dark-card rounded-t-xl p-3 mx-2 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <div className="w-12 h-12  bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                             <Bot className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -111,7 +109,7 @@ const AIChatModal = ({ open, onClose }) => {
                                 Your Personal AI Assistant.
                             </p>
                         </div>
-                        <div className="ml-auto flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                        <div className="hidden md:flex ml-auto items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                             <MessageCircle className="w-4 h-4" />
                             <span>Private & Secure</span>
                         </div>
@@ -122,7 +120,7 @@ const AIChatModal = ({ open, onClose }) => {
                 <div className="flex flex-col h-[70vh] bg-white dark:bg-dark-card rounded-b-xl">
                     {/* Conversation Starters */}
                     {messages.length <= 1 && (
-                        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                        <div className="md:p-6 p-3 border-b border-gray-200 dark:border-gray-700">
                             <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
                                 Quick conversation starters:
                             </h3>
@@ -141,11 +139,11 @@ const AIChatModal = ({ open, onClose }) => {
                     )}
 
                     {/* Messages Area */}
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                    <div className="flex-1 overflow-y-auto md:p-6 p-2 space-y-4">
                         {messages.map((message) => (
                             <div
                                 key={message.id}
-                                className={`flex gap-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                                className={`flex gap-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                             >
                                 {message.sender === 'ai' && (
                                     <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -154,13 +152,13 @@ const AIChatModal = ({ open, onClose }) => {
                                 )}
 
                                 <div
-                                    className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl ${message.sender === 'user'
+                                    className={`max-w-xs md:max-w-md lg:max-w-lg px-2 md:px-4 py-2 rounded-2xl ${message.sender === 'user'
                                         ? 'bg-brand-orange text-white rounded-br-md'
                                         : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-md'
                                         }`}
                                 >
                                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                                    <p className={`text-xs mt-2 ${message.sender === 'user'
+                                    <p className={`text-xs ${message.sender === 'user'
                                         ? 'text-orange-100'
                                         : 'text-gray-500 dark:text-gray-400'
                                         }`}>
@@ -178,8 +176,8 @@ const AIChatModal = ({ open, onClose }) => {
 
                         {/* Typing Indicator */}
                         {isTyping && (
-                            <div className="flex gap-3 justify-start">
-                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <div className="flex gap-2 justify-start">
+                                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
                                     <Bot className="w-4 h-4 text-white" />
                                 </div>
                                 <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 rounded-2xl rounded-bl-md">
@@ -195,17 +193,17 @@ const AIChatModal = ({ open, onClose }) => {
                     </div>
 
                     {/* Input Area */}
-                    <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-                        <div className="flex gap-3">
+                    <div className="border-t border-gray-200 dark:border-gray-700 p-1 md:p-2">
+                        <div className="flex gap-2">
                             <div className="flex-1 relative">
                                 <textarea
                                     value={inputMessage}
                                     onChange={(e) => setInputMessage(e.target.value)}
                                     onKeyPress={handleKeyPress}
-                                    placeholder="Type your message here... (Press Enter to send)"
+                                    placeholder="Type your message here... "
                                     rows={1}
                                     className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent resize-none text-sm"
-                                    style={{ minHeight: '48px', maxHeight: '120px' }}
+                                    style={{ minHeight: '45px', maxHeight: '110px' }}
                                 />
                             </div>
                             <button

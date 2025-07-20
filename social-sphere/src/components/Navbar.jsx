@@ -9,7 +9,7 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import logo from "../assets/logo_new.png";
 import SidebarNavigation from "./homePageComponents/SidebarNavigation";
 import SearchBar from "./SearchBar";
-import { FaSignOutAlt, FaFire, FaUserPlus, FaUserLock, FaHome, FaMoon, FaSun } from "react-icons/fa";
+import { FaSignOutAlt, FaFire, FaUserPlus, FaUserLock, FaHome, FaMoon, FaSun, FaRobot } from "react-icons/fa";
 
 const Navbar = () => {
     const { theme, toggleTheme } = useTheme();
@@ -212,6 +212,13 @@ const Navbar = () => {
                                     className="w-full py-2 px-4 text-brand-orange font-semibold flex items-center gap-2 whitespace-nowrap"
                                 >
                                     <FaUserPlus className="text-xl" /> SignUp
+                                </Link>
+                                <Link
+                                    to="/ai-chat"
+                                    onClick={() => setIsSidebarOpen(false)}
+                                    className="w-full py-2 px-4 text-brand-orange font-semibold flex items-center gap-2 whitespace-nowrap"
+                                >
+                                    <FaRobot className="text-xl" />Soli - AI
                                 </Link>
                             </>
                         ) : (
